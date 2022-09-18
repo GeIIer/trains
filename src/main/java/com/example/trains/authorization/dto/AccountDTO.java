@@ -12,13 +12,9 @@ public class AccountDTO {
     @NonNull
     private Long id;
     @NonNull
-    private String firstName;
-    @NonNull
-    private String lastName;
+    private String name;
     @NonNull
     private String email;
-    @NonNull
-    private String phoneNumber;
     @NonNull
     private List<String> roles;
 }

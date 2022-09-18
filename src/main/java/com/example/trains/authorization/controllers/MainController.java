@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/services/controller/user")
 @AllArgsConstructor
 public class MainController {
@@ -35,10 +35,8 @@ public class MainController {
         if (email != null){
             AccountEntity accountEntity = accountRepository.findByEmail(email);
             return new AccountDTO(accountEntity.getId(),
-                    accountEntity.getFirstName(),
-                    accountEntity.getLastName(),
+                    accountEntity.getName(),
                     accountEntity.getEmail(),
-                    accountEntity.getPhoneNumber(),
                     accountEntity.getRoles()
                             .stream()
                             .map(RoleEntity::getName)
@@ -62,12 +60,10 @@ public class MainController {
             return ResponseEntity.badRequest().body("Error: Email уже существует");
         }
         ArrayList<RoleEntity> roles = new ArrayList<>();
-        roles.add(roleRepository.findByName("USER"));
+        roles.add(roleRepository.findByName("MODERATOR"));
         AccountEntity accountEntity = new AccountEntity();
-        accountEntity.setFirstName(account.getFirstName());
-        accountEntity.setLastName(account.getLastName());
+        accountEntity.setName(account.getName());
         accountEntity.setEmail(account.getEmail());
-        accountEntity.setPhoneNumber(account.getPhoneNumber());
         accountEntity.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
         accountEntity.setRoles(roles);
         accountRepository.save(accountEntity);
