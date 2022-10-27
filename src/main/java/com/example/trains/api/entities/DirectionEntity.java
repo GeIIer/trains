@@ -1,30 +1,26 @@
 package com.example.trains.api.entities;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "timetable")
-public class TimetableEntity {
+@Getter
+@Setter
+@Table(name = "direction")
+public class DirectionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long idTimetable;
+    private  Long idDirection;
 
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
-    private DirectionEntity direction;
+    private CityEntity departureCity;
 
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
-    private TrainEntity train;
-
-    private int trackNumber;
-    private String platformNumber;
-
-    private Date departureTime;
-    private Date arrivalTime;
-
+    private CityEntity arrivalCity;
 }
