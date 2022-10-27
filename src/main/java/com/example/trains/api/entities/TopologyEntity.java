@@ -19,6 +19,7 @@ public class TopologyEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long idTopology;
 
+
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
     private AccountEntity account;
 

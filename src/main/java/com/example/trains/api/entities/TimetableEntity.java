@@ -16,6 +16,9 @@ public class TimetableEntity {
     private Long idTimetable;
 
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
+    private TopologyEntity topology;
+
+    @ManyToOne (fetch = FetchType.LAZY, optional = false)
     private DirectionEntity direction;
 
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
