@@ -1,6 +1,5 @@
 package com.example.trains.api.entities;
 
-import com.example.trains.authorization.entities.AccountEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,19 +12,15 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "topology")
-public class TopologyEntity {
+@Table(name = "direction")
+public class DirectionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long idTopology;
-
-
-    @ManyToOne (fetch = FetchType.LAZY, optional = false)
-    private AccountEntity account;
+    private  Long idDirection;
 
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
-    private CityEntity city;
+    private CityEntity departureCity;
 
-    private String filename;
-
+    @ManyToOne (fetch = FetchType.LAZY, optional = false)
+    private CityEntity arrivalCity;
 }

@@ -7,25 +7,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "topology")
-public class TopologyEntity {
+@Table(name = "train")
+public class TrainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long idTopology;
+    private Long idTrain;
 
-
-    @ManyToOne (fetch = FetchType.LAZY, optional = false)
-    private AccountEntity account;
-
-    @ManyToOne (fetch = FetchType.LAZY, optional = false)
-    private CityEntity city;
-
-    private String filename;
-
+    private String typeTrain;
 }
