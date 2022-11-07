@@ -29,5 +29,4 @@ public class TimetableEntity {
 
     private Date departureTime;
     private Date arrivalTime;
-
 }
