@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/services/controller/user")
 @AllArgsConstructor
-public class MainController {
+public class AccountController {
     @Autowired
     private UserService userService;
     @Autowired

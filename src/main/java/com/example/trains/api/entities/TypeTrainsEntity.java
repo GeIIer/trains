@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Table(name = "type_train")
-public class TypeOfTrainsEntity {
+public class TypeTrainsEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long idType;

@@ -17,7 +17,6 @@ public class TrainEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long idTrain;
-
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
-    private TypeOfTrainsEntity typeTrain;
+    private TypeTrainsEntity typeTrain;
 }
