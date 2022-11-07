@@ -1,39 +1,26 @@
 package com.example.trains.api.dto;
 
-public class Cell {
-    private int idCell;
+import lombok.*;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+
+@Data
+@NoArgsConstructor
+public class Cell implements Serializable {
+    @NonNull
+    private int id;
+    @NonNull
     private int x;
+    @NonNull
     private int y;
-    //xyi poi-mi sho za state, voobse eto object
+    private State state;
 
-
-    public Cell(int idCell, int x, int y) {
-        this.idCell = idCell;
+    public Cell (int id, int x, int y, State state) {
+        this.id = id;
         this.x = x;
         this.y = y;
+        this.state = state;
     }
 
-    public void setIdCell(int idCell) {
-        this.idCell = idCell;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getIdCell() {
-        return idCell;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
 }

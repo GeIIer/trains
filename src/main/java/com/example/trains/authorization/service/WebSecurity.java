@@ -50,8 +50,8 @@ public class WebSecurity {
                 .antMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
                 .antMatchers(HttpMethod.POST, SecurityConstants.LOGIN_URL).permitAll()
                 .antMatchers(HttpMethod.POST, SecurityConstants.REGISTER_URL).permitAll()
-                .anyRequest().hasRole("ADMIN").and()//убрать общий доступ на запросы
-
+                //.anyRequest().hasRole("ADMIN").and()//убрать общий доступ на запросы
+                .anyRequest().permitAll().and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager, accountRepository))
 
                 .addFilter(new JWTAuthorizationFilter(authenticationManager, accountRepository))
