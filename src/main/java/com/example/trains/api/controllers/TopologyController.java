@@ -1,14 +1,21 @@
 package com.example.trains.api.controllers;
 
+import com.example.trains.api.dto.Cell;
+import com.example.trains.api.dto.TopologyDTO;
 import com.example.trains.api.dto.TopologyFileDTO;
 import com.example.trains.api.entities.TopologyEntity;
+import com.example.trains.api.factory.TopologyDTOFactory;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,6 +25,10 @@ public class TopologyController {
 
     @Autowired
     private final TopologyRepository topologyRepository;
+
+    @Autowired
+    private final TopologyDTOFactory topologyDTOFactory;
+
 
     @Autowired
     private final FileService fileService;
@@ -38,7 +49,7 @@ public class TopologyController {
 
             TopologyEntity newTopology = new TopologyEntity();
             fileService.save(topology);
-
+            System.out.println("Топология загружена");
             System.out.println(topology.getTitle());
             System.out.println(topology.getBody());
             return "Топология загружена";
@@ -50,17 +61,25 @@ public class TopologyController {
     }
 
     @GetMapping(DOWNLOAD_TOPOLOGY)
-    public String downloadTopology(@RequestBody String file) {
+    public ArrayList<ArrayList<Cell>> downloadTopology(@RequestParam("idTopology") Long idTopology) {
         try {
-            System.out.println(file);
-            TopologyFileDTO topology = gson.fromJson(file, TopologyFileDTO.class);
-            System.out.println(topology.getTitle());
-            System.out.println(topology.getBody());
-            return "Файл загружен";
+                TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
+                if (topology != null) {
+                    System.out.println(gson.toJson(fileService.load(topology.getFilename()).getBody()));
+                    return fileService.load(topology.getFilename()).getBody();
+            }
+            return null;
         }
         catch (Exception ex) {
             System.err.println(ex.getMessage());
         }
-        return "Ошибка";
+        return null;
+    }
+
+    @GetMapping(GET_ALL_TOPOLOGY)
+    public List<TopologyDTO> getAllTopology() {
+        return (topologyRepository.findAll()
+                .stream().map(topologyDTOFactory::makeTopologyDTO)
+                .collect(Collectors.toList()));
     }
 }

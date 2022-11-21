@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TopologyRepository extends JpaRepository<TopologyEntity, Long> {
+
+    boolean existsByIdTopology(Long idTopology);
+    TopologyEntity findByIdTopology(Long idTopology);
 }

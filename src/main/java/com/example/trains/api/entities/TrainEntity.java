@@ -1,6 +1,5 @@
 package com.example.trains.api.entities;
 
-import com.example.trains.authorization.entities.AccountEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

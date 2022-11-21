@@ -40,9 +40,15 @@ public class FileService {
         }
     }
 
-    public void load(String fileName) {
+    public TopologyFileDTO load (String fileName) {
         try {
-
+            Path root = Paths.get(uploadPath);
+            if (!Files.exists(root)) {
+                throw new RuntimeException("Ошибка: Такой директории нет");
+            }
+            FileInputStream fileInputStream = new FileInputStream(root.toString() + "/" + fileName + ".bin");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            return (TopologyFileDTO) objectInputStream.readObject();
         } catch (Exception e) {
             throw new RuntimeException("Ошибка: " + e.getMessage());
         }

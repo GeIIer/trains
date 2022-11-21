@@ -3,7 +3,6 @@ package com.example.trains.api.dto;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +13,9 @@ public class Cell implements Serializable {
     private int x;
     @NonNull
     private int y;
+
+    private String type;
+
     private State state;
 
     public Cell (int id, int x, int y, State state) {

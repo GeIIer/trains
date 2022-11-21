@@ -19,12 +19,13 @@ public class TopologyEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long idTopology;
 
-
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
     private AccountEntity account;
 
     @ManyToOne (fetch = FetchType.LAZY, optional = false)
     private CityEntity city;
+
+    private String topologyName;
 
     private String filename;
 
