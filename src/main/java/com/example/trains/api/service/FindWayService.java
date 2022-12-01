@@ -45,15 +45,15 @@ public class FindWayService {
             ways.add(way);
             return;
         }
-        ArrayList<int[]> arrayDirrection = cell.getArrayDirection(); //topology.getCell(x,y).getArrayDirection();
+        ArrayList<int[]> arrayDirection = topology.getCell(step.getX(),step.getY()).getArrayDirection(); //topology.getCell(x,y).getArrayDirection();
         int revDirection;
         if(step.getDirection()>3) revDirection=step.getDirection()-4;
         else revDirection=step.getDirection()+4;
-        for(int i=0; i<arrayDirrection.size(); i++){
-            if((arrayDirrection.get(i)[0]==revDirection)||(arrayDirrection.get(i)[1]==revDirection)){
+        for(int i=0; i<arrayDirection.size(); i++){
+            if((arrayDirection.get(i)[0]==revDirection)||(arrayDirection.get(i)[1]==revDirection)){
                 int newDirection;
-                if(arrayDirrection.get(i)[0]==revDirection) newDirection = arrayDirrection.get(i)[1];
-                else newDirection = arrayDirrection.get(i)[0];
+                if(arrayDirection.get(i)[0]==revDirection) newDirection = arrayDirection.get(i)[1];
+                else newDirection = arrayDirection.get(i)[0];
                 int[] newXY = getNewXY(step.getX(),step.getY(),newDirection);
                 Step newStep = new Step(newXY[0], newXY[1], newDirection);
                 if(!way.contains(newStep)){
@@ -63,8 +63,8 @@ public class FindWayService {
             }
         }
     }
-    public int[] getNewXY(int x,int y, int dirrection){
-        switch(dirrection){
+    public int[] getNewXY(int x,int y, int direction){
+        switch(direction){
             case 0:
                 return new int[] {x+1,y};
             case 1:

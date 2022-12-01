@@ -54,7 +54,7 @@ public class Rail extends State implements Serializable {
     }
 
     @Override
-    public void getInfo() {
-
+    public Object getInfo() {
+        return this;
     }
 }

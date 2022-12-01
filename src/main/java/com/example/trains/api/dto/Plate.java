@@ -13,16 +13,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Plate extends State implements Serializable {
-    @NonNull
     @JsonProperty("dir")
     private boolean dir;
-    @NonNull
     @JsonProperty("line1")
     private PlateLine line1;
-
     @JsonProperty("line2")
     private PlateLine line2;
-
     @JsonProperty("number")
     private int number;
 
@@ -35,7 +31,7 @@ public class Plate extends State implements Serializable {
     }
 
     @Override
-    public void getInfo() {
-
+    public Object getInfo() {
+        return this;
     }
 }

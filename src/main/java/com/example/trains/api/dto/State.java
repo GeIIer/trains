@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property="type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property="type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value=Rail.class, name="rail"),
         @JsonSubTypes.Type(value=Plate.class, name="plate"),
@@ -14,5 +14,5 @@ import com.fasterxml.jackson.databind.JsonNode;
 public abstract class State {
     public abstract void setInfo(JsonNode jsonNode);
 
-    public abstract void getInfo();
+    public abstract Object getInfo();
 }

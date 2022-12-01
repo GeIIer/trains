@@ -5,12 +5,10 @@ import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.factory.TopologyDTOFactory;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
-//import com.google.gson.GsonBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-//import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +19,10 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping({"/api/topology"})
 public class TopologyController {
-
     @Autowired
     private final TopologyRepository topologyRepository;
-
     @Autowired
     private final TopologyDTOFactory topologyDTOFactory;
-
-
     @Autowired
     private final FileService fileService;
 
@@ -38,14 +32,11 @@ public class TopologyController {
 
     private static final String GET_ALL_TOPOLOGY = "/all";
 
-    //private static final Gson gson = new GsonBuilder().registerTypeAdapter(State.class, new InterfaceAdapter()).create();
-
 
     @PostMapping(UPLOAD_TOPOLOGY)
     public String uploadTopology(@RequestBody String file) {
         try {
             System.out.println(file);
-            //TopologyFileDTO topology = gson.fromJson(file, TopologyFileDTO.class);
             ObjectMapper mapper = new ObjectMapper();
             TopologyFileDTO topology = mapper.readValue(file, TopologyFileDTO.class);
             TopologyEntity newTopology = new TopologyEntity();
@@ -58,7 +49,7 @@ public class TopologyController {
         catch (Exception ex) {
             System.err.println(ex.getMessage());
         }
-        return "Ошибка";
+        throw new RuntimeException("Ошибка:");
     }
 
     @GetMapping(DOWNLOAD_TOPOLOGY)
@@ -66,15 +57,14 @@ public class TopologyController {
         try {
                 TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
                 if (topology != null) {
-                    //System.out.println(gson.toJson(fileService.load(topology.getFilename()).getBody()));
                     return fileService.load(topology.getFilename()).getBody();
             }
-            return null;
+            throw new RuntimeException();
         }
         catch (Exception ex) {
             System.err.println(ex.getMessage());
         }
-        return null;
+        throw new RuntimeException();
     }
 
     @GetMapping(GET_ALL_TOPOLOGY)

@@ -20,4 +20,9 @@ public class TopologyFileDTO implements Serializable {
     @NonNull
     @JsonProperty("body")
     private ArrayList<ArrayList<Cell>> body;
+
+    public Cell getCell(int x, int y) {
+        int matrixLength = body.size();
+        return body.get(x).get(y);
+    }
 }
