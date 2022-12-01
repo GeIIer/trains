@@ -1,20 +1,19 @@
 package com.example.trains.api.controllers;
 
-import com.example.trains.api.dto.Cell;
-import com.example.trains.api.dto.TopologyDTO;
-import com.example.trains.api.dto.TopologyFileDTO;
+import com.example.trains.api.dto.*;
 import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.factory.TopologyDTOFactory;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
+//import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.google.gson.Gson;
+//import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,14 +38,16 @@ public class TopologyController {
 
     private static final String GET_ALL_TOPOLOGY = "/all";
 
-    private static final Gson gson = new Gson();
+    //private static final Gson gson = new GsonBuilder().registerTypeAdapter(State.class, new InterfaceAdapter()).create();
+
 
     @PostMapping(UPLOAD_TOPOLOGY)
     public String uploadTopology(@RequestBody String file) {
         try {
             System.out.println(file);
-            TopologyFileDTO topology = gson.fromJson(file, TopologyFileDTO.class);
-
+            //TopologyFileDTO topology = gson.fromJson(file, TopologyFileDTO.class);
+            ObjectMapper mapper = new ObjectMapper();
+            TopologyFileDTO topology = mapper.readValue(file, TopologyFileDTO.class);
             TopologyEntity newTopology = new TopologyEntity();
             fileService.save(topology);
             System.out.println("Топология загружена");
@@ -65,7 +66,7 @@ public class TopologyController {
         try {
                 TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
                 if (topology != null) {
-                    System.out.println(gson.toJson(fileService.load(topology.getFilename()).getBody()));
+                    //System.out.println(gson.toJson(fileService.load(topology.getFilename()).getBody()));
                     return fileService.load(topology.getFilename()).getBody();
             }
             return null;

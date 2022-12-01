@@ -1,6 +1,8 @@
 package com.example.trains.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.*;
 
 import java.io.Serializable;
@@ -9,11 +11,13 @@ import java.util.ArrayList;
 @Builder(builderClassName = "Builder", toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonDeserialize(using = TopologyFileDTODeserializer.class)
 public class TopologyFileDTO implements Serializable {
     @NonNull
+    @JsonProperty("title")
     private String title;
 
     @NonNull
+    @JsonProperty("body")
     private ArrayList<ArrayList<Cell>> body;
-
 }

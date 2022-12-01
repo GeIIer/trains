@@ -1,24 +1,18 @@
 package com.example.trains.api.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.lang.Nullable;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-@Data
-@NoArgsConstructor
-public class State implements Serializable {
-    private boolean x;
-    private boolean y;
-    private boolean dx;
-    private boolean dy;
-    private boolean rx_top;
-    private boolean rx_down;
-    private boolean rx_left;
-    private boolean rx_right;
-    private boolean ry_top;
-    private boolean ry_down;
-    private boolean ry_left;
-    private boolean ry_right;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.JsonNode;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property="type")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value=Rail.class, name="rail"),
+        @JsonSubTypes.Type(value=Plate.class, name="plate"),
+        @JsonSubTypes.Type(value=State.class, name="none")
+})
+public abstract class State {
+    public abstract void setInfo(JsonNode jsonNode);
+
+    public abstract void getInfo();
 }
