@@ -43,7 +43,7 @@ public class FindWayService {
     public void rec(Step step){
         way.add(step);
         if ((step.getX()==endX)&&(step.getY()==endY)){
-            ways.add(way);
+            ways.add(new ArrayList<Step>(way));
             return;
         }
         ArrayList<int[]> arrayDirection = topology.getCell(step.getX(),step.getY()).getArrayDirection();//topology.getCell(x,y).getArrayDirection();
