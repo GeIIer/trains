@@ -30,12 +30,12 @@ public class FindWayService {
             int sizeWay = ways.get(0).size();
             int x = 0;
             for(int j =1; j<ways.size(); j++){
-                if(ways.get(1).size()<sizeWay){
+                if(ways.get(j).size()<sizeWay){
                     x=j;
-                    sizeWay=ways.get(1).size();
+                    sizeWay=ways.get(j).size();
                 }
             }
-            endWay.addAll(way);
+            endWay.addAll(ways.get(x));
         }
         return endWay;
     }
