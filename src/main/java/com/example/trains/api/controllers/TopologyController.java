@@ -6,6 +6,7 @@ import com.example.trains.api.factory.TopologyDTOFactory;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -53,11 +54,21 @@ public class TopologyController {
     }
 
     @GetMapping(DOWNLOAD_TOPOLOGY)
-    public ArrayList<ArrayList<Cell>> downloadTopology(@RequestParam("idTopology") Long idTopology) {
+    public String downloadTopology(@RequestParam("idTopology") Long idTopology) {
         try {
                 TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
                 if (topology != null) {
-                    return fileService.load(topology.getFilename()).getBody();
+                    TopologyFileDTO topologyFileDTO = fileService.load(topology.getFilename());
+
+                    ObjectMapper mapper = new ObjectMapper();
+
+                    SimpleModule module = new SimpleModule();
+                    module.addSerializer(TopologyFileDTO.class, new TopologyFileDTOSerializer());
+                    mapper.registerModule(module);
+
+                    String serialized = mapper.writeValueAsString(topologyFileDTO);
+
+                    return serialized;
             }
             throw new RuntimeException();
         }
