@@ -26,6 +26,7 @@ public class FindWayService {
             Step step = endWay.get(endWay.size()-1);
             endWay.remove(endWay.size()-1);
             way.clear();
+            ways.clear();
             rec(step);
             int sizeWay = ways.get(0).size();
             int x = 0;
@@ -45,7 +46,8 @@ public class FindWayService {
             ways.add(way);
             return;
         }
-        ArrayList<int[]> arrayDirection = topology.getCell(step.getX(),step.getY()).getArrayDirection(); //topology.getCell(x,y).getArrayDirection();
+        ArrayList<int[]> arrayDirection = topology.getCell(step.getX(),step.getY()).getArrayDirection();//topology.getCell(x,y).getArrayDirection();
+        if (arrayDirection.size() == 0) return;
         int revDirection;
         if(step.getDirection()>3) revDirection=step.getDirection()-4;
         else revDirection=step.getDirection()+4;
@@ -66,21 +68,21 @@ public class FindWayService {
     public int[] getNewXY(int x,int y, int direction){
         switch(direction){
             case 0:
-                return new int[] {x+1,y};
+                return new int[] {x,y+1};
             case 1:
                 return new int[] {x+1,y+1};
             case 2:
-                return new int[] {x,y+1};
+                return new int[] {x+1,y};
             case 3:
-                return new int[] {x-1,y+1};
+                return new int[] {x+1,y-1};
             case 4:
-                return new int[] {x-1,y};
+                return new int[] {x,y-1};
             case 5:
                 return new int[] {x-1,y-1};
             case 6:
-                return new int[] {x,y-1};
+                return new int[] {x-1,y};
             case 7:
-                return new int[] {x+1,y-1};
+                return new int[] {x-1,y+1};
         }
         return null;
     }

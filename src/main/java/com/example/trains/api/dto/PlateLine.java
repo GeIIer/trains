@@ -7,10 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import java.io.Serializable;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlateLine {
+public class PlateLine implements Serializable {
     @NonNull
     @JsonProperty("x")
     private int x;
@@ -21,8 +23,8 @@ public class PlateLine {
     private int number;
 
     public PlateLine(JsonNode jsonNode) {
-        this.x = jsonNode.get("x").asInt();
-        this.y = jsonNode.get("y").asInt();
-        this.number = jsonNode.get("number").asInt();
+        if (jsonNode.has("x")) this.x = jsonNode.get("x").asInt();
+        if (jsonNode.has("y")) this.y = jsonNode.get("y").asInt();
+        if (jsonNode.has("number")) this.number = jsonNode.get("number").asInt();
     }
 }

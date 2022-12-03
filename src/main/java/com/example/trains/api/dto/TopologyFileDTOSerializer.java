@@ -29,33 +29,33 @@ public class TopologyFileDTOSerializer extends StdSerializer<TopologyFileDTO > {
             for (int i = 0; i < cellArray.size(); i++) {
                 Cell cell = cellArray.get(i);
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeStringField("id", String.valueOf(cell.getId()));
-                jsonGenerator.writeStringField("x", String.valueOf(cell.getX()));
-                jsonGenerator.writeStringField("y", String.valueOf(cell.getY()));
+                jsonGenerator.writeNumberField("id", cell.getId());
+                jsonGenerator.writeNumberField("x", cell.getX());
+                jsonGenerator.writeNumberField("y", cell.getY());
                 jsonGenerator.writeStringField("type", cell.getType());
                 if (cell.getType().equals("rail")) {
                     Rail rail = (Rail) cell.getState().getInfo();
                     jsonGenerator.writeObjectFieldStart("state");
 
-                    jsonGenerator.writeStringField("x", String.valueOf(rail.isX()));
-                    jsonGenerator.writeStringField("y", String.valueOf(rail.isY()));
-                    jsonGenerator.writeStringField("dx", String.valueOf(rail.isDx()));
-                    jsonGenerator.writeStringField("dy", String.valueOf(rail.isDy()));
-                    jsonGenerator.writeStringField("rx_top", String.valueOf(rail.isRx_top()));
-                    jsonGenerator.writeStringField("rx_down", String.valueOf(rail.isRx_down()));
-                    jsonGenerator.writeStringField("rx_left", String.valueOf(rail.isRx_left()));
-                    jsonGenerator.writeStringField("rx_right", String.valueOf(rail.isRx_right()));
-                    jsonGenerator.writeStringField("ry_top", String.valueOf(rail.isRy_top()));
-                    jsonGenerator.writeStringField("ry_down", String.valueOf(rail.isRy_down()));
-                    jsonGenerator.writeStringField("ry_left", String.valueOf(rail.isRy_left()));
-                    jsonGenerator.writeStringField("ry_right", String.valueOf(rail.isRy_right()));
+                    jsonGenerator.writeBooleanField("x", rail.isX());
+                    jsonGenerator.writeBooleanField("y", rail.isY());
+                    jsonGenerator.writeBooleanField("dx", rail.isDx());
+                    jsonGenerator.writeBooleanField("dy", rail.isDy());
+                    jsonGenerator.writeBooleanField("rx_top", rail.isRx_top());
+                    jsonGenerator.writeBooleanField("rx_down", rail.isRx_down());
+                    jsonGenerator.writeBooleanField("rx_left", rail.isRx_left());
+                    jsonGenerator.writeBooleanField("rx_right", rail.isRx_right());
+                    jsonGenerator.writeBooleanField("ry_top", rail.isRy_top());
+                    jsonGenerator.writeBooleanField("ry_down", rail.isRy_down());
+                    jsonGenerator.writeBooleanField("ry_left", rail.isRy_left());
+                    jsonGenerator.writeBooleanField("ry_right", rail.isRy_right());
 
                     jsonGenerator.writeEndObject();
                 }
                 else if (cell.getType().equals("plate")) {
                     Plate plate = (Plate) cell.getState().getInfo();
                     jsonGenerator.writeObjectFieldStart("state");
-                    jsonGenerator.writeStringField("dir", String.valueOf(plate.isDir()));
+                    jsonGenerator.writeBooleanField("dir", plate.isDir());
                     //line1
                     jsonGenerator.writeObjectFieldStart("line1");
                     jsonGenerator.writeNumberField("x", plate.getLine1().getX());
