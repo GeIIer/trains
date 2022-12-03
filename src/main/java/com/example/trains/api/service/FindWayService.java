@@ -14,7 +14,6 @@ public class FindWayService {
     int endX;
     int endY;
     TopologyFileDTO topology = new TopologyFileDTO();
-    Cell cell;
     public ArrayList<Step> getWay(Step start, Cell end, ArrayList<Cell> stops,TopologyFileDTO topology){
         this.topology = topology;
         ArrayList<Step> endWay = new ArrayList<>();
@@ -46,7 +45,9 @@ public class FindWayService {
             ways.add(new ArrayList<Step>(way));
             return;
         }
-        ArrayList<int[]> arrayDirection = topology.getCell(step.getX(),step.getY()).getArrayDirection();//topology.getCell(x,y).getArrayDirection();
+        Cell cell = topology.getCell(step.getX(),step.getY());
+        if(cell == null) return;
+        ArrayList<int[]> arrayDirection = cell.getArrayDirection();
         if (arrayDirection.size() == 0) return;
         int revDirection;
         if(step.getDirection()>3) revDirection=step.getDirection()-4;
