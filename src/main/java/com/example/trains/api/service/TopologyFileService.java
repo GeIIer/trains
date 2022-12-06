@@ -24,6 +24,7 @@ public class TopologyFileService {
     //TODO
     public ArrayList<Cell> getInOut(ArrayList<ArrayList<Cell>> matrix) {
         ArrayList<Cell> cells = new ArrayList<>();
+        System.out.println("I love you <3");
         for (int i = 0; i < matrix.get(0).size(); i++) {
             matrix.get(0).get(i);
         }
