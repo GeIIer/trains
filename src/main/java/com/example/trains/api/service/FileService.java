@@ -1,6 +1,6 @@
 package com.example.trains.api.service;
 
-import com.example.trains.api.dto.TopologyFileDTO;
+import com.example.trains.api.topologyFile.TopologyFileDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class FileService {
         }
     }
 
-    public void save(TopologyFileDTO topology) {
+    public void saveTopology(TopologyFileDTO topology) {
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
@@ -40,7 +40,16 @@ public class FileService {
         }
     }
 
-    public TopologyFileDTO load (String fileName) {
+    //TODO
+    public void saveTimetable (Record[] records) {
+        try {
+
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка: " + e.getMessage());
+        }
+    }
+
+    public TopologyFileDTO loadTopology(String fileName) {
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {

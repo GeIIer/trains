@@ -1,8 +1,8 @@
 package com.example.trains.api.service;
 
-import com.example.trains.api.dto.Cell;
-import com.example.trains.api.dto.Step;
-import com.example.trains.api.dto.TopologyFileDTO;
+import com.example.trains.api.topologyFile.Cell;
+import com.example.trains.api.topologyFile.Step;
+import com.example.trains.api.topologyFile.TopologyFileDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

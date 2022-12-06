@@ -5,6 +5,9 @@ import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.factory.TopologyDTOFactory;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
+import com.example.trains.api.topologyFile.Plate;
+import com.example.trains.api.topologyFile.TopologyFileDTO;
+import com.example.trains.api.topologyFile.TopologyFileDTOSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.RequiredArgsConstructor;
@@ -33,15 +36,17 @@ public class TopologyController {
 
     private static final String GET_ALL_TOPOLOGY = "/all";
 
+    private static final String GET_ALL_PLATES = "/plates";
 
-    @PostMapping(UPLOAD_TOPOLOGY)
+
+    @PostMapping(UPLOAD_TOPOLOGY) //TODO
     public String uploadTopology(@RequestBody String file) {
         try {
             System.out.println(file);
             ObjectMapper mapper = new ObjectMapper();
             TopologyFileDTO topology = mapper.readValue(file, TopologyFileDTO.class);
             TopologyEntity newTopology = new TopologyEntity();
-            fileService.save(topology);
+            fileService.saveTopology(topology);
             System.out.println("Топология загружена");
             System.out.println(topology.getTitle());
             System.out.println(topology.getBody());
@@ -58,7 +63,7 @@ public class TopologyController {
         try {
                 TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
                 if (topology != null) {
-                    TopologyFileDTO topologyFileDTO = fileService.load(topology.getFilename());
+                    TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
 
                     ObjectMapper mapper = new ObjectMapper();
 
@@ -83,5 +88,22 @@ public class TopologyController {
         return (topologyRepository.findAll()
                 .stream().map(topologyDTOFactory::makeTopologyDTO)
                 .collect(Collectors.toList()));
+    }
+
+    @GetMapping (GET_ALL_PLATES)
+    public ArrayList<Plate> getAllPlates(@RequestParam("idTopology") Long idTopology) {
+        try {
+            TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
+            if (topology != null) {
+                TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
+
+
+            }
+            throw new RuntimeException();
+        }
+        catch (Exception ex) {
+            System.err.println(ex.getMessage());
+        }
+        throw new RuntimeException();
     }
 }
