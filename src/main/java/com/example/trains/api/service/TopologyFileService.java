@@ -26,24 +26,26 @@ public class TopologyFileService {
     public ArrayList<Cell> getInOut(ArrayList<ArrayList<Cell>> matrix) {
         ArrayList<Cell> cells = new ArrayList<>();
         for (int i = 0; i < matrix.size(); i++) {
+            int z = 0;
+            for(int j=0; j<2;j++) {
+                Cell x = matrix.get(i).get(z);
+                if (x.getType().equals("rail")) {
+                    Rail r = (Rail) x.getState().getInfo();
+                    if (r.isY()) cells.add(x);
+                }
+                z=matrix.get(i).size()-1;
+            }
+        }
+        int i = 0;
+        for (int z = 0; z < 2; z++) {
             for(int j=0; j<matrix.get(i).size(); j++) {
                 Cell x = matrix.get(i).get(j);
                 if (x.getType().equals("rail")) {
                     Rail r = (Rail) x.getState().getInfo();
                     if (r.isX()) cells.add(x);
                 }
-                j=matrix.get(i).size()-2;
             }
-        }
-        for (int i = 0; i < matrix.size(); i++) {
-            for(int j=0; j<matrix.get(i).size(); j++) {
-                Cell x = matrix.get(i).get(j);
-                if (x.getType().equals("rail")) {
-                    Rail r = (Rail) x.getState().getInfo();
-                    if (r.isY()) cells.add(x);
-                }
-            }
-            i=matrix.size()-2;
+            i=matrix.size()-1;
         }
 
         return cells;
