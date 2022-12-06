@@ -5,6 +5,7 @@ import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.factory.TopologyDTOFactory;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
+import com.example.trains.api.service.TopologyFileService;
 import com.example.trains.api.topologyFile.Plate;
 import com.example.trains.api.topologyFile.TopologyFileDTO;
 import com.example.trains.api.topologyFile.TopologyFileDTOSerializer;
@@ -29,6 +30,8 @@ public class TopologyController {
     private final TopologyDTOFactory topologyDTOFactory;
     @Autowired
     private final FileService fileService;
+    @Autowired
+    private final TopologyFileService topologyFileService;
 
     private static final String UPLOAD_TOPOLOGY = "";
 
@@ -96,7 +99,7 @@ public class TopologyController {
             TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
             if (topology != null) {
                 TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
-
+                topologyFileService.getInOut(topologyFileDTO.getBody());
 
             }
             throw new RuntimeException();
