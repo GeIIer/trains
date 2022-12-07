@@ -35,4 +35,5 @@ public class Plate extends State implements Serializable {
     public Object getInfo() {
         return this;
     }
+
 }
