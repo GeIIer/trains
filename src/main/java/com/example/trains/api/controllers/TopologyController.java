@@ -63,21 +63,19 @@ public class TopologyController {
     }
 
     @GetMapping(DOWNLOAD_TOPOLOGY)
-    public ArrayList<ArrayList<Cell>> downloadTopology(@RequestParam("idTopology") Long idTopology) {
+    public String downloadTopology(@RequestParam("idTopology") Long idTopology) {
         try {
                 TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
                 if (topology != null) {
                     TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
 
-//                    ObjectMapper mapper = new ObjectMapper();
-//
-//                    SimpleModule module = new SimpleModule();
-//                    module.addSerializer(TopologyFileDTO.class, new TopologyFileDTOSerializer());
-//                    mapper.registerModule(module);
-//
-//                    String serialized = mapper.writeValueAsString(topologyFileDTO);
+                    ObjectMapper mapper = new ObjectMapper();
 
-                    return topologyFileDTO.getBody();
+                    SimpleModule module = new SimpleModule();
+                    module.addSerializer(TopologyFileDTO.class, new TopologyFileDTOSerializer());
+                    mapper.registerModule(module);
+
+                    return mapper.writeValueAsString(topologyFileDTO);
             }
             throw new RuntimeException();
         }

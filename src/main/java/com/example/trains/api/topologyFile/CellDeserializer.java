@@ -24,7 +24,7 @@ public class CellDeserializer extends StdDeserializer<Cell> {
         super(vc);
     }
 
-    private Cell getCell(JsonNode jsonNode) {
+    public Cell getCell(JsonNode jsonNode) {
         Cell cell = new Cell();
         cell.setId(jsonNode.get("id").asInt());
         cell.setX(jsonNode.get("x").asInt());
