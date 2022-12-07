@@ -26,7 +26,8 @@ public class Plate extends State implements Serializable {
         if (jsonNode.has("lines")) {
             var lines1 = jsonNode.get("lines");
             for (int i = 0; i < lines1.size(); i++) {
-                lines.add(new PlateLine(lines1.get("x").asInt(), lines1.get("y").asInt(), lines1.get("number").asInt()));
+                var line = lines1.get(i);
+                lines.add(new PlateLine(line.get("x").asInt(), line.get("y").asInt(), line.get("number").asInt()));
             }
         }
         if (jsonNode.has("number")) this.number = jsonNode.get("number").asInt();
