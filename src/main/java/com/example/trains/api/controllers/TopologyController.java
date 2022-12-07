@@ -6,9 +6,10 @@ import com.example.trains.api.factory.TopologyDTOFactory;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
 import com.example.trains.api.service.TopologyFileService;
-import com.example.trains.api.topologyFile.Plate;
-import com.example.trains.api.topologyFile.TopologyFileDTO;
-import com.example.trains.api.topologyFile.TopologyFileDTOSerializer;
+import com.example.trains.api.timetableFile.PlatesAndInOut;
+import com.example.trains.api.timetableFile.PlatesAndInOutSerializer;
+import com.example.trains.api.topologyFile.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.RequiredArgsConstructor;
@@ -94,19 +95,26 @@ public class TopologyController {
     }
 
     @GetMapping (GET_ALL_PLATES)
-    public ArrayList<Plate> getAllPlates(@RequestParam("idTopology") Long idTopology) {
-        try {
-            TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
-            if (topology != null) {
-                TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
-                topologyFileService.getInOut(topologyFileDTO.getBody());
-
+    public String getAllPlates(@RequestParam("idTopology") Long idTopology) {
+        TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
+        if (topology != null) {
+            TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
+            ArrayList<Cell> inOut = topologyFileService.getInOut(topologyFileDTO.getBody());
+            ArrayList<Plate> plates = topologyFileService.getPlates(topologyFileDTO.getBody());
+            PlatesAndInOut platesAndInOut = new PlatesAndInOut(inOut, plates);
+            ObjectMapper mapper = new ObjectMapper();
+            SimpleModule module = new SimpleModule();
+            module.addSerializer(PlatesAndInOut.class, new PlatesAndInOutSerializer());
+            try {
+                mapper.registerModule(module);
+                String json = mapper.writeValueAsString( platesAndInOut );
+                return json;
             }
-            throw new RuntimeException();
+            catch ( JsonProcessingException jsonProcessingException ) {
+                System.err.println(jsonProcessingException.getMessage() );
+                throw new RuntimeException( jsonProcessingException );
+            }
         }
-        catch (Exception ex) {
-            System.err.println(ex.getMessage());
-        }
-        throw new RuntimeException();
+        throw new RuntimeException("GBYFC");
     }
 }
