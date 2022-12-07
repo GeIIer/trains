@@ -30,19 +30,9 @@ public class PlatesAndInOutSerializer extends StdSerializer<PlatesAndInOut> {
         jsonGenerator.writeArrayFieldStart("plates");
         for (int i = 0; i < platesAndInOut.getPlates().size(); i++) {
             Plate plate = platesAndInOut.getPlates().get(i);
-//            jsonGenerator.writeBooleanField("dir", plate.isDir());
-//            //line1
-//            jsonGenerator.writeArrayFieldStart("lines");
-//            for (PlateLine lines : plate.getLines()) {
-//                jsonGenerator.writeNumberField("x", lines.getX());
-//                jsonGenerator.writeNumberField("y", lines.getY());
-//                jsonGenerator.writeNumberField("number", lines.getNumber());
-//            }
-//            jsonGenerator.writeEndArray();
-//
-//            jsonGenerator.writeNumberField("number", plate.getNumber());
-//            jsonGenerator.writeEndObject();
+            jsonGenerator.writeStartObject();
             cellSerializer.plateSerialize(plate, jsonGenerator);
+            jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();
         jsonGenerator.writeEndObject();

@@ -6,11 +6,16 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class TopologyFileDTODeserializer extends StdDeserializer<TopologyFileDTO> {
+    public TopologyFileDTODeserializer() {
+        this(null);
+    }
+
     public TopologyFileDTODeserializer(Class<?> vc) {
         super(vc);
     }

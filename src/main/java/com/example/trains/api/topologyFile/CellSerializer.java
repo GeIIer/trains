@@ -40,19 +40,8 @@ public class CellSerializer extends StdSerializer<Cell> {
         else if (cell.getType().equals("plate")) {
             Plate plate = (Plate) cell.getState().getInfo();
             jsonGenerator.writeObjectFieldStart("state");
-//            jsonGenerator.writeBooleanField("dir", plate.isDir());
-//            //lines
-//            jsonGenerator.writeArrayFieldStart("lines");
-//            for (PlateLine lines : plate.getLines()) {
-//                jsonGenerator.writeNumberField("x", lines.getX());
-//                jsonGenerator.writeNumberField("y", lines.getY());
-//                jsonGenerator.writeNumberField("number", lines.getNumber());
-//            }
-//            jsonGenerator.writeEndArray();
-//
-//            jsonGenerator.writeNumberField("number", plate.getNumber());
-//            jsonGenerator.writeEndObject();
             plateSerialize(plate, jsonGenerator);
+            jsonGenerator.writeEndObject();
         }
         else {
             jsonGenerator.writeObjectFieldStart("state");
@@ -63,18 +52,21 @@ public class CellSerializer extends StdSerializer<Cell> {
 
     public void plateSerialize (Plate plate, JsonGenerator jsonGenerator)
             throws IOException {
+
         jsonGenerator.writeBooleanField("dir", plate.isDir());
         //lines
         jsonGenerator.writeArrayFieldStart("lines");
         for (PlateLine lines : plate.getLines()) {
+            jsonGenerator.writeStartObject();
             jsonGenerator.writeNumberField("x", lines.getX());
             jsonGenerator.writeNumberField("y", lines.getY());
             jsonGenerator.writeNumberField("number", lines.getNumber());
+            jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();
 
         jsonGenerator.writeNumberField("number", plate.getNumber());
-        jsonGenerator.writeEndObject();
+
     }
 
     public CellSerializer() {

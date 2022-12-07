@@ -74,8 +74,8 @@ public class TopologyController {
                     SimpleModule module = new SimpleModule();
                     module.addSerializer(TopologyFileDTO.class, new TopologyFileDTOSerializer());
                     mapper.registerModule(module);
-
-                    return mapper.writeValueAsString(topologyFileDTO);
+                    String str = mapper.writeValueAsString(topologyFileDTO);
+                    return str;
             }
             throw new RuntimeException();
         }
@@ -93,7 +93,7 @@ public class TopologyController {
     }
 
     @GetMapping (GET_ALL_PLATES)
-    public PlatesAndInOut getAllPlates(@RequestParam("idTopology") Long idTopology) {
+    public String getAllPlates(@RequestParam("idTopology") Long idTopology) {
         try {
             TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
             if (topology != null) {
@@ -101,19 +101,19 @@ public class TopologyController {
                 ArrayList<Cell> inOut = topologyFileService.getInOut(topologyFileDTO.getBody());
                 ArrayList<Plate> plates = topologyFileService.getPlates(topologyFileDTO.getBody());
                 PlatesAndInOut platesAndInOut = new PlatesAndInOut(inOut, plates);
-//            ObjectMapper mapper = new ObjectMapper();
-//            SimpleModule module = new SimpleModule();
-//            module.addSerializer(PlatesAndInOut.class, new PlatesAndInOutSerializer());
-//            try {
-//                mapper.registerModule(module);
-//                String json = mapper.writeValueAsString( platesAndInOut );
-//                return json;
-//            }
-//            catch ( JsonProcessingException jsonProcessingException ) {
-//                System.err.println(jsonProcessingException.getMessage() );
-//                throw new RuntimeException( jsonProcessingException );
-//            }
-                return platesAndInOut;
+                ObjectMapper mapper = new ObjectMapper();
+                SimpleModule module = new SimpleModule();
+                module.addSerializer(PlatesAndInOut.class, new PlatesAndInOutSerializer());
+                try {
+                    mapper.registerModule(module);
+                    String json = mapper.writeValueAsString( platesAndInOut );
+                    return json;
+                }
+                catch ( JsonProcessingException jsonProcessingException ) {
+                    System.err.println(jsonProcessingException.getMessage() );
+                    throw new RuntimeException( jsonProcessingException );
+                }
+                //return platesAndInOut;
             }
         }
         catch (Exception ex){
