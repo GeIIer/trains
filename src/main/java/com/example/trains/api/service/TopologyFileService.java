@@ -11,7 +11,6 @@ import java.util.HashSet;
 
 @Service
 public class TopologyFileService {
-    //TODO мы поняли что нужен сериализатор, но нам лень
     public ArrayList<Plate> getPlates (ArrayList<ArrayList<Cell>> matrix) {
         ArrayList<Plate> plates = new ArrayList<>();
         for (ArrayList<Cell> array : matrix) {

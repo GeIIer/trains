@@ -11,8 +11,8 @@ import java.util.ArrayList;
 @Builder(builderClassName = "Builder", toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonDeserialize(using = TopologyFileDTODeserializer.class)
-@JsonSerialize(using = TopologyFileDTOSerializer.class)
+//@JsonDeserialize(using = TopologyFileDTODeserializer.class)
+//@JsonSerialize(using = TopologyFileDTOSerializer.class)
 public class TopologyFileDTO implements Serializable {
     @JsonProperty("title")
     private String title;

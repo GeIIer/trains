@@ -63,21 +63,21 @@ public class TopologyController {
     }
 
     @GetMapping(DOWNLOAD_TOPOLOGY)
-    public String downloadTopology(@RequestParam("idTopology") Long idTopology) {
+    public ArrayList<ArrayList<Cell>> downloadTopology(@RequestParam("idTopology") Long idTopology) {
         try {
                 TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
                 if (topology != null) {
                     TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
 
-                    ObjectMapper mapper = new ObjectMapper();
+//                    ObjectMapper mapper = new ObjectMapper();
+//
+//                    SimpleModule module = new SimpleModule();
+//                    module.addSerializer(TopologyFileDTO.class, new TopologyFileDTOSerializer());
+//                    mapper.registerModule(module);
+//
+//                    String serialized = mapper.writeValueAsString(topologyFileDTO);
 
-                    SimpleModule module = new SimpleModule();
-                    module.addSerializer(TopologyFileDTO.class, new TopologyFileDTOSerializer());
-                    mapper.registerModule(module);
-
-                    String serialized = mapper.writeValueAsString(topologyFileDTO);
-
-                    return serialized;
+                    return topologyFileDTO.getBody();
             }
             throw new RuntimeException();
         }
@@ -95,25 +95,31 @@ public class TopologyController {
     }
 
     @GetMapping (GET_ALL_PLATES)
-    public String getAllPlates(@RequestParam("idTopology") Long idTopology) {
-        TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
-        if (topology != null) {
-            TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
-            ArrayList<Cell> inOut = topologyFileService.getInOut(topologyFileDTO.getBody());
-            ArrayList<Plate> plates = topologyFileService.getPlates(topologyFileDTO.getBody());
-            PlatesAndInOut platesAndInOut = new PlatesAndInOut(inOut, plates);
-            ObjectMapper mapper = new ObjectMapper();
-            SimpleModule module = new SimpleModule();
-            module.addSerializer(PlatesAndInOut.class, new PlatesAndInOutSerializer());
-            try {
-                mapper.registerModule(module);
-                String json = mapper.writeValueAsString( platesAndInOut );
-                return json;
+    public PlatesAndInOut getAllPlates(@RequestParam("idTopology") Long idTopology) {
+        try {
+            TopologyEntity topology = topologyRepository.findByIdTopology(idTopology);
+            if (topology != null) {
+                TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
+                ArrayList<Cell> inOut = topologyFileService.getInOut(topologyFileDTO.getBody());
+                ArrayList<Plate> plates = topologyFileService.getPlates(topologyFileDTO.getBody());
+                PlatesAndInOut platesAndInOut = new PlatesAndInOut(inOut, plates);
+//            ObjectMapper mapper = new ObjectMapper();
+//            SimpleModule module = new SimpleModule();
+//            module.addSerializer(PlatesAndInOut.class, new PlatesAndInOutSerializer());
+//            try {
+//                mapper.registerModule(module);
+//                String json = mapper.writeValueAsString( platesAndInOut );
+//                return json;
+//            }
+//            catch ( JsonProcessingException jsonProcessingException ) {
+//                System.err.println(jsonProcessingException.getMessage() );
+//                throw new RuntimeException( jsonProcessingException );
+//            }
+                return platesAndInOut;
             }
-            catch ( JsonProcessingException jsonProcessingException ) {
-                System.err.println(jsonProcessingException.getMessage() );
-                throw new RuntimeException( jsonProcessingException );
-            }
+        }
+        catch (Exception ex){
+            System.err.println(ex.getMessage());
         }
         throw new RuntimeException("GBYFC");
     }

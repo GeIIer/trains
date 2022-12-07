@@ -12,7 +12,7 @@ import java.util.ArrayList;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonSerialize(using = PlatesAndInOutSerializer.class)
+//@JsonSerialize(using = PlatesAndInOutSerializer.class)
 public class PlatesAndInOut {
     @JsonProperty("inOut")
     ArrayList<Cell> inOut;

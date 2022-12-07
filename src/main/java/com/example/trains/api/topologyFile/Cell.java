@@ -1,6 +1,8 @@
 package com.example.trains.api.topologyFile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import java.io.Serializable;
@@ -11,6 +13,8 @@ import java.util.ArrayList;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonDeserialize(using = CellDeserializer.class)
+@JsonSerialize(using = CellSerializer.class)
 public class Cell implements Serializable {
     @JsonProperty("id")
     private int id;
