@@ -36,6 +36,8 @@ public class Rail extends State implements Serializable {
     private boolean ry_left;
     @JsonProperty("ry_right")
     private boolean ry_right;
+    @JsonProperty("light")
+    private boolean light;
 
     @Override
     public void setInfo(JsonNode jsonNode) {
@@ -51,6 +53,7 @@ public class Rail extends State implements Serializable {
         if (jsonNode.has("ry_down")) this.setRy_down(jsonNode.get("ry_down").asBoolean());
         if (jsonNode.has("ry_left")) this.setRy_left(jsonNode.get("ry_left").asBoolean());
         if (jsonNode.has("ry_right")) this.setRy_right(jsonNode.get("ry_right").asBoolean());
+        if (jsonNode.has("light")) this.setLight(jsonNode.get("light").asBoolean());
     }
 
     @Override

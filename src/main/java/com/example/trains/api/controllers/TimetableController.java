@@ -2,18 +2,21 @@ package com.example.trains.api.controllers;
 
 import com.example.trains.api.dto.TimetableDTO;
 import com.example.trains.api.entities.TimetableEntity;
+import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.factory.TimetableDTOFactory;
 import com.example.trains.api.repositories.TimetableRepository;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
+import com.example.trains.api.timetableFile.Record;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,11 +36,11 @@ public class TimetableController {
     @Autowired
     private final FileService fileService;
 
+    private static final String GET_RECORDS = "";
+
     private static final String GET_ALL_TIMETABLE = "/all";
 
     private static final String SAVE_TIMETABLE = "/save";
-
-    private static final String CREATE_TIMETABLE = "/create";
 
     @GetMapping(GET_ALL_TIMETABLE)
     public List<TimetableDTO> getAllTimetable(@RequestParam("idTopology") Long idTopology) {
@@ -49,23 +52,53 @@ public class TimetableController {
         throw new RuntimeException("Ошибка: ");
     }
 
-    @PostMapping(SAVE_TIMETABLE)
-    public void save (@RequestParam("idTimetable") Long idTimetable,
-                      @RequestBody Record[] records) {
-        TimetableEntity timetable = timetableRepository.findByIdTimetable(idTimetable);
-        if (timetable != null){
-            fileService.saveTimetable(records);
+    @GetMapping(GET_RECORDS)
+    public ArrayList<Record> getRecordsByTimetable (@RequestParam("idTopology") Long idTopology,
+                                               @RequestParam("date") String dateTimeString) {
+        Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
+        if (optionalTopologyEntity.isPresent()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate date = LocalDate.parse(dateTimeString, formatter);
+            Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndIdTopology(date, idTopology);
+            if (optionalTimetableEntity.isPresent()) {
+                TopologyEntity topology = optionalTopologyEntity.get();
+                TimetableEntity timetable = optionalTimetableEntity.get();
+                return fileService.loadRecords(topology.getFilename(), timetable.getFileName());
+            }
+            else {
+                throw new RuntimeException("Нет записей в расписании: ");
+            }
         }
-        throw new RuntimeException("Расписания не существует: ");
+        else
+        {
+            throw new RuntimeException("Топологии не существует: ");
+        }
     }
-    @PostMapping(CREATE_TIMETABLE)
+    @PostMapping(SAVE_TIMETABLE)
     public void createTimetable (@RequestParam("idTopology") Long idTopology,
-                                 @RequestBody TimetableDTO timetable) {
-        if (topologyRepository.existsByIdTopology(idTopology)){
-            TimetableEntity timetableEntity = new TimetableEntity();
-            timetableEntity.setIdTimetable(timetable.getIdTimetable());
-            timetableEntity.setTimetableDate(LocalDate.from(LocalTime.parse(timetable.getTimetableDate())));
+                                 @RequestParam("date") String dateTimeString,
+                                 @RequestBody ArrayList<Record> records) {
+        Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
+        if (optionalTopologyEntity.isPresent())
+        {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            TopologyEntity topologyEntity = optionalTopologyEntity.get();
+            LocalDate date = LocalDate.parse(dateTimeString, formatter);
+            Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndIdTopology(date, idTopology);
+            TimetableEntity timetableEntity;
+            if (optionalTimetableEntity.isPresent()) {
+                timetableEntity = optionalTimetableEntity.get();
+            } else {
+                timetableEntity = new TimetableEntity();
+                timetableEntity.setTimetableDate(LocalDate.parse(dateTimeString, formatter));
+                timetableEntity.setTopology(topologyEntity);
+                timetableEntity.setFileName(dateTimeString);
+                timetableRepository.save(timetableEntity);
+            }
+            fileService.saveTimetable(topologyEntity, timetableEntity, records);
         }
-        throw new RuntimeException("Топологии не существует: ");
+        else {
+            throw new RuntimeException("Топологии не существует: ");
+        }
     }
 }

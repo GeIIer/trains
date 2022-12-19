@@ -34,6 +34,7 @@ public class CellSerializer extends StdSerializer<Cell> {
             jsonGenerator.writeBooleanField("ry_down", rail.isRy_down());
             jsonGenerator.writeBooleanField("ry_left", rail.isRy_left());
             jsonGenerator.writeBooleanField("ry_right", rail.isRy_right());
+            jsonGenerator.writeBooleanField("light", rail.isLight());
 
             jsonGenerator.writeEndObject();
         }

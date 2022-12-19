@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,12 +31,18 @@ public class FindWayController {
     @GetMapping(GET_ALL_WAYS)
     ArrayList<Step> getAllWays(@RequestParam("idTopology") Long idTopology) {
         try {
-            TopologyEntity topologyEntity = topologyRepository.findByIdTopology(idTopology);
-            TopologyFileDTO topology = fileService.loadTopology(topologyEntity.getFilename());
-            if (topology != null) {
-                return findWayService.getWay(new Step(0,0,2), topology.getCell(15, 4), new ArrayList<Cell>(List.of(topology.getCell(11, 4))), topology);
+            Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
+            if (optionalTopologyEntity.isPresent()) {
+                TopologyEntity topologyEntity = optionalTopologyEntity.get();
+                TopologyFileDTO topology = fileService.loadTopology(topologyEntity.getFilename());
+                if (topology != null) {
+                    return findWayService.getWay(new Step(0, 0, 2), topology.getCell(15, 4), new ArrayList<Cell>(List.of(topology.getCell(11, 4))), topology);
+                }
+                throw new RuntimeException();
             }
-            throw new RuntimeException();
+            else {
+                throw new RuntimeException("Ошибка: Такой топологии не существует");
+            }
         }
         catch (Exception ex) {
             System.err.println(ex.getMessage());
