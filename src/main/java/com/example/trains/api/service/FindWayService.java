@@ -35,6 +35,8 @@ public class FindWayService {
             way.clear();
             ways.clear();
             rec(step);
+            if (ways.size() == 0)
+                return null;
             int sizeWay = ways.get(0).size();
             int x = 0;
             for(int j = 1; j<ways.size(); j++){
@@ -113,6 +115,10 @@ public class FindWayService {
                         exit,
                         new ArrayList<>(Arrays.asList(stop)),
                         topologyFileDTO);
+                if (ways == null)
+                {
+                    throw new RuntimeException("Невозможно проложить путь по заданному маршруту");
+                }
                 recordAndWayDTOS.add(new RecordAndWayDTO(records.get(i), ways));
             }
             return recordAndWayDTOS;

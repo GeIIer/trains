@@ -13,7 +13,9 @@ import com.example.trains.api.timetableFile.Record;
 import com.example.trains.api.topologyFile.TopologyFileDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -82,8 +84,8 @@ public class TimetableController {
         }
         catch (Exception ex){
             System.err.println(ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
-        throw new RuntimeException();
     }
 
     @PostMapping(SAVE_TIMETABLE)
@@ -114,11 +116,13 @@ public class TimetableController {
             }
             catch (Exception ex){
                 System.err.println("Невозможно проложить путь: " + ex.getMessage());
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Невозможно проложить путь по заданному маршруту", ex);
             }
 
         }
         else {
-            throw new RuntimeException("Топологии не существует: ");
+            System.err.println("Топологии не существует");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Топологии не существует");
         }
     }
 

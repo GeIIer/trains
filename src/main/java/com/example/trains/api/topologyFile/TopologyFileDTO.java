@@ -23,7 +23,7 @@ public class TopologyFileDTO implements Serializable {
     public Cell getCell(int x, int y) {
         int maxX = body.size();
         int maxY = body.get(0).size();
-        if((maxX>x)&&(maxY>y))
+        if((x<maxX && x>=0)&&(y<maxY && y>=0))
         return body.get(x).get(y);
         else return null;
     }
