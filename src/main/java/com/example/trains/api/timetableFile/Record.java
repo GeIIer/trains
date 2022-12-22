@@ -11,6 +11,9 @@ import lombok.*;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+
 @Data
 @Getter
 @Setter
@@ -20,7 +23,7 @@ public class Record implements Serializable {
 
     @JsonProperty("plate")
     //@JsonBackReference
-    private Plate plate;
+    private int plate;
     @JsonProperty("plateLine")
     private PlateLine plateLine;
     @JsonProperty("trainName")
@@ -39,5 +42,4 @@ public class Record implements Serializable {
     private Cell in;
     @JsonProperty("out")
     private Cell out;
-
 }

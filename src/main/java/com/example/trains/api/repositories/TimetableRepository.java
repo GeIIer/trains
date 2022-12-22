@@ -16,5 +16,7 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Long
 
     Optional<TimetableEntity> findByTimetableDateAndTopology(LocalDate date, TopologyEntity idTopology);
 
+    Optional<TimetableEntity> findByIdTimetable(Long idTimetable);
+
     List<TimetableEntity> findAllByTopology(TopologyEntity topology);
 }

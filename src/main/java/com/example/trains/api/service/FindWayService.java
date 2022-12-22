@@ -117,7 +117,7 @@ public class FindWayService {
                         topologyFileDTO);
                 if (ways == null)
                 {
-                    throw new RuntimeException("Невозможно проложить путь по заданному маршруту");
+                    throw new RuntimeException("Невозможно проложить путь по заданному маршруту: " + (i+1));
                 }
                 recordAndWayDTOS.add(new RecordAndWayDTO(records.get(i), ways));
             }

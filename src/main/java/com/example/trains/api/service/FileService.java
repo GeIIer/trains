@@ -29,15 +29,15 @@ public class FileService {
         }
     }
 
-    public void saveTopology(TopologyFileDTO topology) {
+    public void saveTopology(TopologyEntity topologyEntity, TopologyFileDTO topology) {
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
                 init();
             }
-            Path topologyPath = Paths.get(uploadPath + "/" + topology.getTitle());
+            Path topologyPath = Paths.get(uploadPath + "/" + topologyEntity.getFilename());
             Files.createDirectories(topologyPath);
-            FileOutputStream fileOutputStream = new FileOutputStream(topologyPath.toString() + "/" + topology.getTitle() + ".bin");
+            FileOutputStream fileOutputStream = new FileOutputStream(topologyPath.toString() + "/" + topologyEntity.getFilename() + ".bin");
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(topology);
             objectOutputStream.close();
@@ -47,13 +47,13 @@ public class FileService {
         }
     }
 
-    public void saveTimetable (TopologyEntity topology, TimetableEntity timetableEntity, ArrayList<Record> records) {
+    public void saveTimetable (TimetableEntity timetableEntity, ArrayList<Record> records) {
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
                 throw new RuntimeException("Ошибка: Такой директории нет");
             }
-            Path filePath = Paths.get(uploadPath + "/" + topology.getFilename() + "/" + timetableEntity.getFileName() + ".bin");
+            Path filePath = Paths.get(uploadPath + "/" + timetableEntity.getFileName());
             FileOutputStream fileOutputStream = new FileOutputStream(filePath.toString());
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
             objectOutputStream.writeObject(records);
@@ -85,13 +85,13 @@ public class FileService {
         }
     }
 
-    public ArrayList<Record> loadRecords (String topologyFile, String fileName) {
+    public ArrayList<Record> loadRecords (String fileName) {
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
                 throw new RuntimeException("Ошибка: Такой директории нет");
             }
-            Path recordsPath = Paths.get(uploadPath + "/" + topologyFile + "/" + fileName + ".bin");
+            Path recordsPath = Paths.get(uploadPath + "/" + fileName);
             if (!Files.exists(recordsPath)) {
                 throw new RuntimeException("Ошибка: Такого расписания нет");
             }
@@ -101,6 +101,19 @@ public class FileService {
             objectInputStream.close();
             fileInputStream.close();
             return records;
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка: " + e.getMessage());
+        }
+    }
+
+    public boolean deleteTimetable (String deletePath) {
+        try {
+            Path path = Paths.get(uploadPath);
+            if (!Files.exists(path)) {
+                throw new RuntimeException("Ошибка: Такой директории нет");
+            }
+            File file = new File(path + "/" + deletePath);
+            return file.delete();
         } catch (Exception e) {
             throw new RuntimeException("Ошибка: " + e.getMessage());
         }

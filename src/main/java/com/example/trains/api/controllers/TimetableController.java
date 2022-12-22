@@ -14,9 +14,12 @@ import com.example.trains.api.topologyFile.TopologyFileDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -48,6 +51,8 @@ public class TimetableController {
     private static final String GET_ALL_TIMETABLE = "/all";
 
     private static final String SAVE_TIMETABLE = "/save";
+
+    private static final String DELETE_TIMETABLE = "/{idTimetable}";
 
     @GetMapping(GET_ALL_TIMETABLE)
     public List<TimetableDTO> getAllTimetable(@RequestParam("idTopology") Long idTopology) {
@@ -106,16 +111,16 @@ public class TimetableController {
                 timetableEntity = new TimetableEntity();
                 timetableEntity.setTimetableDate(LocalDate.parse(dateTimeString, formatter));
                 timetableEntity.setTopology(topologyEntity);
-                timetableEntity.setFileName(dateTimeString);
-                timetableRepository.save(timetableEntity);
+                timetableEntity.setFileName(topologyEntity.getFilename() + "/" + dateTimeString + ".bin");
             }
             TopologyFileDTO topologyFileDTO = fileService.loadTopology(topologyEntity.getFilename());
             try {
                 ArrayList<RecordAndWayDTO> recordAndWayDTOS = findWayService.getRecordsAndWays(records, topologyFileDTO);
-                fileService.saveTimetable(topologyEntity, timetableEntity, records);
+                fileService.saveTimetable(timetableEntity, records);
+                timetableRepository.save(timetableEntity);
             }
             catch (Exception ex){
-                System.err.println("Невозможно проложить путь: " + ex.getMessage());
+                System.err.println("Ошибка: " + ex);
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Невозможно проложить путь по заданному маршруту", ex);
             }
 
@@ -133,9 +138,8 @@ public class TimetableController {
             LocalDate date = LocalDate.parse(dateTimeString, formatter);
             Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndTopology(date, optionalTopologyEntity.get());
             if (optionalTimetableEntity.isPresent()) {
-                TopologyEntity topology = optionalTopologyEntity.get();
                 TimetableEntity timetable = optionalTimetableEntity.get();
-                return fileService.loadRecords(topology.getFilename(), timetable.getFileName());
+                return fileService.loadRecords(timetable.getFileName());
             }
             else {
                 throw new RuntimeException("Нет записей в расписании: ");
@@ -145,5 +149,21 @@ public class TimetableController {
         {
             throw new RuntimeException("Топологии не существует: ");
         }
+    }
+
+    @DeleteMapping(DELETE_TIMETABLE)
+    public ResponseEntity<String> deleteTimetable (@PathVariable("idTimetable") Long idTimetable) {
+
+        Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByIdTimetable(idTimetable);
+        if (optionalTimetableEntity.isEmpty()) {
+            return new ResponseEntity<>("Такого расписания нет", HttpStatus.OK);
+        }
+        TimetableEntity timetable = optionalTimetableEntity.get();
+        if (fileService.deleteTimetable(timetable.getFileName()))
+        {
+            timetableRepository.deleteById(idTimetable);
+            return new ResponseEntity<>("Удаление расписания произошло успешно", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Произошла ошибка при удалении", HttpStatus.OK);
     }
 }

@@ -78,14 +78,11 @@ public class TopologyController {
                 topologyEntity.setTopologyName(topologyName);
                 topologyEntity.setCity(cityRepository.findByCityName(city));
                 topologyEntity.setAccount(accountRepository.findByName(accountName));
-//                String fileName = topologyEntity.getTopologyName() +
-//                        topologyEntity.getAccount().getName();
-//                topologyEntity.setFilename(fileName);
-                topologyEntity.setFilename(topologyName);
+                topologyEntity.setFilename(topologyName + accountName);
 
                 ObjectMapper mapper = new ObjectMapper();
                 TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
-                fileService.saveTopology(topology);
+                fileService.saveTopology(topologyEntity, topology);
 
                 topologyRepository.save(topologyEntity);
             }
@@ -96,16 +93,23 @@ public class TopologyController {
     }
 
     @PostMapping(UPLOAD_TOPOLOGY) //TODO сделать сохранение по idTopology
-    public String uploadTopology(@RequestBody String matrix) {
+    public String uploadTopology(@RequestParam("idTopology") Long idTopology,
+                                 @RequestBody String matrix) {
         try {
-            System.out.println(matrix);
-            ObjectMapper mapper = new ObjectMapper();
-            TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
-            fileService.saveTopology(topology);
-            System.out.println("Топология загружена");
-            System.out.println(topology.getTitle());
-            System.out.println(topology.getBody());
-            return "Топология загружена";
+            Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
+            if (optionalTopologyEntity.isPresent()) {
+                TopologyEntity topologyEntity = optionalTopologyEntity.get();
+                ObjectMapper mapper = new ObjectMapper();
+                TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
+                fileService.saveTopology(topologyEntity, topology);
+                System.out.println("Топология загружена");
+                System.out.println(topology.getTitle());
+                System.out.println(topology.getBody());
+                return "Топология загружена";
+            }
+            else {
+                throw new RuntimeException("Такой топологии не существует:");
+            }
         }
         catch (Exception ex) {
             System.err.println(ex.getMessage());
@@ -187,7 +191,7 @@ public class TopologyController {
                     TopologyEntity topology = optionalTopologyEntity.get();
                     TimetableEntity timetable = optionalTimetableEntity.get();
                     TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
-                    ArrayList<Record> records = fileService.loadRecords(topology.getFilename(), timetable.getFileName());
+                    ArrayList<Record> records = fileService.loadRecords(timetable.getFileName());
                     ArrayList<RecordAndWayDTO> recordAndWayDTOS = findWayService.getRecordsAndWays(records, topologyFileDTO);
                     TopologyAndRecordsDTO topologyAndRecordsDTO = new TopologyAndRecordsDTO(topologyFileDTO.getBody(), recordAndWayDTOS);
                     return topologyAndRecordsDTO;
