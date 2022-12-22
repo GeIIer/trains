@@ -8,6 +8,7 @@ import com.example.trains.api.repositories.CityRepository;
 import com.example.trains.api.repositories.TimetableRepository;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
+import com.example.trains.api.service.FindWayService;
 import com.example.trains.api.service.TopologyFileService;
 import com.example.trains.api.timetableFile.PlatesAndInOut;
 import com.example.trains.api.timetableFile.PlatesAndInOutSerializer;
@@ -46,6 +47,8 @@ public class TopologyController {
     @Autowired
     private final FileService fileService;
     @Autowired
+    private final FindWayService findWayService;
+    @Autowired
     private final TopologyFileService topologyFileService;
 
     private static final String CREATE_TOPOLOGY = "/create";
@@ -60,36 +63,44 @@ public class TopologyController {
     private static final String GET_TOPOLOGY_AND_RECORDS = "/{idTopology}/{date}";
 
     @PostMapping(CREATE_TOPOLOGY)
-    public void createTopology(@RequestBody TopologyDTO topologyDTO) {
+    public void createTopology(@RequestParam("topologyName") String topologyName,
+                               @RequestParam("accountName") String accountName,
+                               @RequestParam("city") String city,
+                               @RequestBody String matrix) {
         try {
-            Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByTopologyNameAndAccount_Name(topologyDTO.getTopologyName(), topologyDTO.getAccountName());
+            Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByTopologyNameAndAccount_Name(topologyName, accountName);
             if (optionalTopologyEntity.isPresent()) {
                 throw new RuntimeException("Такая топология уже существует: ");
             }
             else
             {
                 TopologyEntity topologyEntity = new TopologyEntity();
-                topologyEntity.setTopologyName(topologyDTO.getTopologyName());
-                topologyEntity.setCity(cityRepository.findByCityName(topologyDTO.getCity()));
-                topologyEntity.setAccount(accountRepository.findByName(topologyDTO.getAccountName()));
-                String fileName = topologyEntity.getTopologyName() +
-                        topologyEntity.getIdTopology();
-                topologyEntity.setFilename(fileName);
+                topologyEntity.setTopologyName(topologyName);
+                topologyEntity.setCity(cityRepository.findByCityName(city));
+                topologyEntity.setAccount(accountRepository.findByName(accountName));
+//                String fileName = topologyEntity.getTopologyName() +
+//                        topologyEntity.getAccount().getName();
+//                topologyEntity.setFilename(fileName);
+                topologyEntity.setFilename(topologyName);
+
+                ObjectMapper mapper = new ObjectMapper();
+                TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
+                fileService.saveTopology(topology);
+
                 topologyRepository.save(topologyEntity);
             }
         }
         catch (Exception ex) {
             System.err.println(ex.getMessage());
         }
-        throw new RuntimeException("Ошибка:");
     }
 
     @PostMapping(UPLOAD_TOPOLOGY) //TODO сделать сохранение по idTopology
-    public String uploadTopology(@RequestBody String file) {
+    public String uploadTopology(@RequestBody String matrix) {
         try {
-            System.out.println(file);
+            System.out.println(matrix);
             ObjectMapper mapper = new ObjectMapper();
-            TopologyFileDTO topology = mapper.readValue(file, TopologyFileDTO.class);
+            TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
             fileService.saveTopology(topology);
             System.out.println("Топология загружена");
             System.out.println(topology.getTitle());
@@ -177,7 +188,9 @@ public class TopologyController {
                     TimetableEntity timetable = optionalTimetableEntity.get();
                     TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
                     ArrayList<Record> records = fileService.loadRecords(topology.getFilename(), timetable.getFileName());
-                    return new TopologyAndRecordsDTO(topologyFileDTO.getBody(), records);
+                    ArrayList<RecordAndWayDTO> recordAndWayDTOS = findWayService.getRecordsAndWays(records, topologyFileDTO);
+                    TopologyAndRecordsDTO topologyAndRecordsDTO = new TopologyAndRecordsDTO(topologyFileDTO.getBody(), recordAndWayDTOS);
+                    return topologyAndRecordsDTO;
                 } else {
                     throw new RuntimeException("Нет записей в расписании: ");
                 }

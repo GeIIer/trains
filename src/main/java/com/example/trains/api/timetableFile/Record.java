@@ -1,13 +1,15 @@
 package com.example.trains.api.timetableFile;
 
+import com.example.trains.api.topologyFile.Cell;
 import com.example.trains.api.topologyFile.Plate;
 import com.example.trains.api.topologyFile.PlateLine;
-import com.example.trains.api.topologyFile.Step;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.*;
 
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.time.LocalTime;
 @Data
 @Getter
@@ -17,6 +19,7 @@ import java.time.LocalTime;
 public class Record implements Serializable {
 
     @JsonProperty("plate")
+    //@JsonBackReference
     private Plate plate;
     @JsonProperty("plateLine")
     private PlateLine plateLine;
@@ -33,8 +36,8 @@ public class Record implements Serializable {
     @JsonProperty("typeTrain")
     private String typeTrain;
     @JsonProperty("in")
-    private Step in;
+    private Cell in;
     @JsonProperty("out")
-    private Step out;
+    private Cell out;
 
 }

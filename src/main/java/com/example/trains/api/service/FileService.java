@@ -91,11 +91,11 @@ public class FileService {
             if (!Files.exists(root)) {
                 throw new RuntimeException("Ошибка: Такой директории нет");
             }
-            Path recordsPath = Paths.get(uploadPath + "/" + topologyFile + "/" + fileName);
+            Path recordsPath = Paths.get(uploadPath + "/" + topologyFile + "/" + fileName + ".bin");
             if (!Files.exists(recordsPath)) {
-                throw new RuntimeException("Ошибка: Такой топологии нет");
+                throw new RuntimeException("Ошибка: Такого расписания нет");
             }
-            FileInputStream fileInputStream = new FileInputStream(recordsPath.toString() + "/" + fileName + ".bin");
+            FileInputStream fileInputStream = new FileInputStream(recordsPath.toString());
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             ArrayList<Record> records = (ArrayList<Record>) objectInputStream.readObject();
             objectInputStream.close();

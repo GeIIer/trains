@@ -1,5 +1,6 @@
 package com.example.trains.api.controllers;
 
+import com.example.trains.api.dto.RecordAndWayDTO;
 import com.example.trains.api.dto.TimetableDTO;
 import com.example.trains.api.entities.TimetableEntity;
 import com.example.trains.api.entities.TopologyEntity;
@@ -7,7 +8,9 @@ import com.example.trains.api.factory.TimetableDTOFactory;
 import com.example.trains.api.repositories.TimetableRepository;
 import com.example.trains.api.repositories.TopologyRepository;
 import com.example.trains.api.service.FileService;
+import com.example.trains.api.service.FindWayService;
 import com.example.trains.api.timetableFile.Record;
+import com.example.trains.api.topologyFile.TopologyFileDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,16 +30,18 @@ public class TimetableController {
 
     @Autowired
     private final TimetableRepository timetableRepository;
-
     @Autowired
     private final TopologyRepository topologyRepository;
     @Autowired
     private final TimetableDTOFactory timetableDTOFactory;
-
+    @Autowired
+    private final FindWayService findWayService;
     @Autowired
     private final FileService fileService;
 
     private static final String GET_RECORDS = "";
+
+    private static final String GET_RECORDS_AND_WAY = "/way";
 
     private static final String GET_ALL_TIMETABLE = "/all";
 
@@ -44,10 +49,17 @@ public class TimetableController {
 
     @GetMapping(GET_ALL_TIMETABLE)
     public List<TimetableDTO> getAllTimetable(@RequestParam("idTopology") Long idTopology) {
-        List<TimetableEntity> timetable = timetableRepository.findAllByTopology(idTopology);
-        if (timetable != null) {
-            return timetable.stream().map(timetableDTOFactory::makeTimetableDTO)
-                    .collect(Collectors.toList());
+        Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
+        if (optionalTopologyEntity.isPresent()) {
+            List<TimetableEntity> timetable = timetableRepository.findAllByTopology(optionalTopologyEntity.get());
+            if (timetable != null) {
+                return timetable.stream().map(timetableDTOFactory::makeTimetableDTO)
+                        .collect(Collectors.toList());
+            }
+        }
+        else
+        {
+            throw new RuntimeException("Ошибка: Нет такой топологии");
         }
         throw new RuntimeException("Ошибка: ");
     }
@@ -55,25 +67,25 @@ public class TimetableController {
     @GetMapping(GET_RECORDS)
     public ArrayList<Record> getRecordsByTimetable (@RequestParam("idTopology") Long idTopology,
                                                @RequestParam("date") String dateTimeString) {
-        Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
-        if (optionalTopologyEntity.isPresent()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate date = LocalDate.parse(dateTimeString, formatter);
-            Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndIdTopology(date, idTopology);
-            if (optionalTimetableEntity.isPresent()) {
-                TopologyEntity topology = optionalTopologyEntity.get();
-                TimetableEntity timetable = optionalTimetableEntity.get();
-                return fileService.loadRecords(topology.getFilename(), timetable.getFileName());
-            }
-            else {
-                throw new RuntimeException("Нет записей в расписании: ");
-            }
-        }
-        else
-        {
-            throw new RuntimeException("Топологии не существует: ");
-        }
+        return getRecords(idTopology, dateTimeString);
     }
+
+    @GetMapping(GET_RECORDS_AND_WAY) //TODO Оптимизировать говнокод
+    public ArrayList<RecordAndWayDTO> getRecordsAndWays (@RequestParam("idTopology") Long idTopology,
+                                                         @RequestParam("date") String dateTimeString) {
+        try {
+            ArrayList<Record> records = getRecords(idTopology, dateTimeString);
+            Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
+            TopologyEntity topology = optionalTopologyEntity.get();
+            TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
+            return findWayService.getRecordsAndWays(records, topologyFileDTO);
+        }
+        catch (Exception ex){
+            System.err.println(ex.getMessage());
+        }
+        throw new RuntimeException();
+    }
+
     @PostMapping(SAVE_TIMETABLE)
     public void createTimetable (@RequestParam("idTopology") Long idTopology,
                                  @RequestParam("date") String dateTimeString,
@@ -98,6 +110,27 @@ public class TimetableController {
             fileService.saveTimetable(topologyEntity, timetableEntity, records);
         }
         else {
+            throw new RuntimeException("Топологии не существует: ");
+        }
+    }
+
+    private ArrayList<Record> getRecords(Long idTopology, String dateTimeString) {
+        Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
+        if (optionalTopologyEntity.isPresent()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate date = LocalDate.parse(dateTimeString, formatter);
+            Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndIdTopology(date, idTopology);
+            if (optionalTimetableEntity.isPresent()) {
+                TopologyEntity topology = optionalTopologyEntity.get();
+                TimetableEntity timetable = optionalTimetableEntity.get();
+                return fileService.loadRecords(topology.getFilename(), timetable.getFileName());
+            }
+            else {
+                throw new RuntimeException("Нет записей в расписании: ");
+            }
+        }
+        else
+        {
             throw new RuntimeException("Топологии не существует: ");
         }
     }

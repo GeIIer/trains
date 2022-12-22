@@ -3,10 +3,9 @@ package com.example.trains.api.topologyFile;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
+import org.springframework.lang.Nullable;
 
 import java.io.Serializable;
-
-@Data
 @Getter
 @Setter
 @AllArgsConstructor
@@ -54,6 +53,22 @@ public class Rail extends State implements Serializable {
         if (jsonNode.has("ry_left")) this.setRy_left(jsonNode.get("ry_left").asBoolean());
         if (jsonNode.has("ry_right")) this.setRy_right(jsonNode.get("ry_right").asBoolean());
         if (jsonNode.has("light")) this.setLight(jsonNode.get("light").asBoolean());
+    }
+    //TODO проверка на угол
+    public int getDir (int x, int y, int lengthX, int lengthY) {
+        if (x == 0) {
+            if (this.x) return 2;
+        }
+        else if (x == lengthX - 1) {
+            if (this.x) return 6;
+        }
+        else if (y == 0) {
+            if (this.y) return 0;
+        }
+        else if (y == lengthY - 1) {
+            if (this.y) return 4;
+        }
+        throw new RuntimeException("Ошибка направления");
     }
 
     @Override

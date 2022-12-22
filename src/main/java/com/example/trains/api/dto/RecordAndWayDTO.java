@@ -1,6 +1,7 @@
 package com.example.trains.api.dto;
 
-import com.example.trains.api.topologyFile.Cell;
+import com.example.trains.api.timetableFile.Record;
+import com.example.trains.api.topologyFile.Step;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,9 +14,10 @@ import java.util.ArrayList;
 @Builder(builderClassName = "Builder", toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class TopologyAndRecordsDTO {
-    @JsonProperty("matrix")
-    private ArrayList<ArrayList<Cell>> matrix;
-    @JsonProperty("records")
-    private ArrayList<RecordAndWayDTO> recordAndWayDTO = new ArrayList<>();
+public class RecordAndWayDTO {
+    @JsonProperty("record")
+    private Record record;
+    @JsonProperty("way")
+    private ArrayList<Step> way = new ArrayList<>();
+
 }

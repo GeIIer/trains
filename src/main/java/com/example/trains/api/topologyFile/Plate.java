@@ -1,17 +1,21 @@
 package com.example.trains.api.topologyFile;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "number")
 public class Plate extends State implements Serializable {
     @JsonProperty("dir")
     private boolean dir;
@@ -37,5 +41,4 @@ public class Plate extends State implements Serializable {
     public Object getInfo() {
         return this;
     }
-
 }

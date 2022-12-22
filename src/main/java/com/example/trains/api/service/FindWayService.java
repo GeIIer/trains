@@ -1,11 +1,19 @@
 package com.example.trains.api.service;
 
+import com.example.trains.api.dto.RecordAndWayDTO;
+import com.example.trains.api.entities.TopologyEntity;
+import com.example.trains.api.timetableFile.Record;
 import com.example.trains.api.topologyFile.Cell;
+import com.example.trains.api.topologyFile.Rail;
 import com.example.trains.api.topologyFile.Step;
 import com.example.trains.api.topologyFile.TopologyFileDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 public class FindWayService {
@@ -14,7 +22,7 @@ public class FindWayService {
     int endX;
     int endY;
     TopologyFileDTO topology = new TopologyFileDTO();
-    public ArrayList<Step> getWay(Step start, Cell end, ArrayList<Cell> stops,TopologyFileDTO topology){
+    public ArrayList<Step> getWay(Step start, Cell end, ArrayList<Cell> stops, TopologyFileDTO topology){
         this.topology = topology;
         ArrayList<Step> endWay = new ArrayList<>();
         endWay.add(start);
@@ -50,8 +58,8 @@ public class FindWayService {
         ArrayList<int[]> arrayDirection = cell.getArrayDirection();
         if (arrayDirection.size() == 0) return;
         int revDirection;
-        if(step.getDirection()>3) revDirection=step.getDirection()-4;
-        else revDirection=step.getDirection()+4;
+        if(step.getDir()>3) revDirection=step.getDir()-4;
+        else revDirection=step.getDir()+4;
         for(int i=0; i<arrayDirection.size(); i++){
             if((arrayDirection.get(i)[0]==revDirection)||(arrayDirection.get(i)[1]==revDirection)){
                 int newDirection;
@@ -66,7 +74,7 @@ public class FindWayService {
             }
         }
     }
-    public int[] getNewXY(int x,int y, int direction){
+    private int[] getNewXY(int x,int y, int direction){
         switch(direction){
             case 0:
                 return new int[] {x,y+1};
@@ -86,5 +94,32 @@ public class FindWayService {
                 return new int[] {x-1,y+1};
         }
         return null;
+    }
+    //TODO Оптимизировать говнокод
+    public ArrayList<RecordAndWayDTO> getRecordsAndWays (ArrayList<Record> records, TopologyFileDTO topologyFileDTO) {
+        try {
+            ArrayList<RecordAndWayDTO> recordAndWayDTOS = new ArrayList<>();
+            int lengthX = topologyFileDTO.getBody().size();
+            int lengthY = topologyFileDTO.getBody().get(0).size();
+            for (int i = 0; i < records.size(); i++) {
+                int xPlateLine = records.get(i).getPlateLine().getX();
+                int yPlateLine = records.get(i).getPlateLine().getY();
+                Cell stop = topologyFileDTO.getCell(xPlateLine, yPlateLine);
+                Cell exit = records.get(i).getOut();
+                int x = records.get(i).getIn().getX();
+                int y = records.get(i).getIn().getY();
+                int dir = ((Rail) records.get(i).getIn().getState()).getDir(x, y, lengthX, lengthY);
+                ArrayList<Step> ways = getWay(new Step(x, y, dir),
+                        exit,
+                        new ArrayList<>(Arrays.asList(stop)),
+                        topologyFileDTO);
+                recordAndWayDTOS.add(new RecordAndWayDTO(records.get(i), ways));
+            }
+            return recordAndWayDTOS;
+        }
+        catch (Exception ex){
+            System.err.println(ex.getMessage());
+        }
+        throw new RuntimeException();
     }
 }
