@@ -182,7 +182,7 @@ public class TopologyController {
             if (optionalTopologyEntity.isPresent()) {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
                 LocalDate date = LocalDate.parse(dateTimeString, formatter);
-                Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndIdTopology(date, idTopology);
+                Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndTopology(date, optionalTopologyEntity.get());
                 if (optionalTimetableEntity.isPresent()) {
                     TopologyEntity topology = optionalTopologyEntity.get();
                     TimetableEntity timetable = optionalTimetableEntity.get();

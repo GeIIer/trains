@@ -14,9 +14,7 @@ import java.util.Optional;
 @Repository
 public interface TimetableRepository extends JpaRepository<TimetableEntity, Long> {
 
-    @Query(value = "SELECT * FROM timetable t WHERE t.timetable_date = :date AND topology_id_topology IN \n" +
-            "(SELECT topology_id_topology FROM topology top WHERE top.id_topology = :idTopology)", nativeQuery = true)
-    Optional<TimetableEntity> findByTimetableDateAndIdTopology (LocalDate date, Long idTopology);
+    Optional<TimetableEntity> findByTimetableDateAndTopology(LocalDate date, TopologyEntity idTopology);
 
     List<TimetableEntity> findAllByTopology(TopologyEntity topology);
 }

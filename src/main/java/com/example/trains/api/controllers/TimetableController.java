@@ -96,7 +96,7 @@ public class TimetableController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             TopologyEntity topologyEntity = optionalTopologyEntity.get();
             LocalDate date = LocalDate.parse(dateTimeString, formatter);
-            Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndIdTopology(date, idTopology);
+            Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndTopology(date, topologyEntity);
             TimetableEntity timetableEntity;
             if (optionalTimetableEntity.isPresent()) {
                 timetableEntity = optionalTimetableEntity.get();
@@ -107,7 +107,15 @@ public class TimetableController {
                 timetableEntity.setFileName(dateTimeString);
                 timetableRepository.save(timetableEntity);
             }
-            fileService.saveTimetable(topologyEntity, timetableEntity, records);
+            TopologyFileDTO topologyFileDTO = fileService.loadTopology(topologyEntity.getFilename());
+            try {
+                ArrayList<RecordAndWayDTO> recordAndWayDTOS = findWayService.getRecordsAndWays(records, topologyFileDTO);
+                fileService.saveTimetable(topologyEntity, timetableEntity, records);
+            }
+            catch (Exception ex){
+                System.err.println("Невозможно проложить путь: " + ex.getMessage());
+            }
+
         }
         else {
             throw new RuntimeException("Топологии не существует: ");
@@ -119,7 +127,7 @@ public class TimetableController {
         if (optionalTopologyEntity.isPresent()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             LocalDate date = LocalDate.parse(dateTimeString, formatter);
-            Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndIdTopology(date, idTopology);
+            Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndTopology(date, optionalTopologyEntity.get());
             if (optionalTimetableEntity.isPresent()) {
                 TopologyEntity topology = optionalTopologyEntity.get();
                 TimetableEntity timetable = optionalTimetableEntity.get();
