@@ -1,6 +1,7 @@
 package com.example.trains.api.controllers;
 
 import com.example.trains.api.dto.*;
+import com.example.trains.api.entities.CityEntity;
 import com.example.trains.api.entities.TimetableEntity;
 import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.factory.TopologyDTOFactory;
@@ -20,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -53,14 +56,12 @@ public class TopologyController {
 
     private static final String CREATE_TOPOLOGY = "/create";
     private static final String UPLOAD_TOPOLOGY = "";
-
     private static final String DOWNLOAD_TOPOLOGY = "";
-
     private static final String GET_ALL_TOPOLOGY = "/all";
-
     private static final String GET_ALL_PLATES = "/plates";
-
     private static final String GET_TOPOLOGY_AND_RECORDS = "/{idTopology}/{date}";
+
+    private static final String DELETE_TOPOLOGY = "/{idTopology}";
 
     @PostMapping(CREATE_TOPOLOGY)
     public void createTopology(@RequestParam("topologyName") String topologyName,
@@ -74,17 +75,23 @@ public class TopologyController {
             }
             else
             {
-                TopologyEntity topologyEntity = new TopologyEntity();
-                topologyEntity.setTopologyName(topologyName);
-                topologyEntity.setCity(cityRepository.findByCityName(city));
-                topologyEntity.setAccount(accountRepository.findByName(accountName));
-                topologyEntity.setFilename(topologyName + accountName);
+                Optional<CityEntity> cityEntity = cityRepository.findByCityName(city);
+                if (cityEntity.isPresent()) {
+                    TopologyEntity topologyEntity = new TopologyEntity();
+                    topologyEntity.setTopologyName(topologyName);
+                    topologyEntity.setCity(cityEntity.get());
+                    topologyEntity.setAccount(accountRepository.findByName(accountName));
+                    topologyEntity.setFilename(topologyName + accountName);
 
-                ObjectMapper mapper = new ObjectMapper();
-                TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
-                fileService.saveTopology(topologyEntity, topology);
+                    ObjectMapper mapper = new ObjectMapper();
+                    TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
+                    fileService.saveTopology(topologyEntity, topology);
 
-                topologyRepository.save(topologyEntity);
+                    topologyRepository.save(topologyEntity);
+                }
+                else {
+                    throw new RuntimeException("Такого города нет ");
+                }
             }
         }
         catch (Exception ex) {
@@ -206,5 +213,20 @@ public class TopologyController {
             System.err.println(ex.getMessage());
         }
         throw new RuntimeException("Ошибка: ");
+    }
+
+    @DeleteMapping(DELETE_TOPOLOGY)
+    public ResponseEntity<String> deleteTimetable (@PathVariable("idTopology") Long idTopology) {
+        Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
+        if (optionalTopologyEntity.isEmpty()) {
+            return new ResponseEntity<>("Такой топологии нет", HttpStatus.OK);
+        }
+        TopologyEntity topology = optionalTopologyEntity.get();
+        timetableRepository.deleteAllByTopology(idTopology);
+        topologyRepository.delete(topology);
+        if (fileService.deleteTopology(topology.getFilename())) {
+            return new ResponseEntity<>("Удаление топологии произошло успешно", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Произошла ошибка при удалении", HttpStatus.OK);
     }
 }

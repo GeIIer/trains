@@ -118,4 +118,24 @@ public class FileService {
             throw new RuntimeException("Ошибка: " + e.getMessage());
         }
     }
+
+    public boolean deleteTopology(String deletePath) {
+        try {
+            Path path = Paths.get(uploadPath);
+            if (!Files.exists(path)) {
+                throw new RuntimeException("Ошибка: Такой директории нет");
+            }
+            File file = new File(path + "/" + deletePath);
+            String[] entries = file.list();
+            if (entries != null) {
+                for (String s : entries) {
+                    File currentFile = new File(file.getPath(), s);
+                    currentFile.delete();
+                }
+            }
+            return file.delete();
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка: " + e.getMessage());
+        }
+    }
 }

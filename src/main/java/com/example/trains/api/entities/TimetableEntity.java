@@ -25,4 +25,6 @@ public class TimetableEntity {
     private TopologyEntity topology;
 
     private String fileName;
+
+    private boolean status;
 }

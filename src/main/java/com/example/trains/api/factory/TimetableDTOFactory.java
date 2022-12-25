@@ -12,6 +12,7 @@ public class TimetableDTOFactory {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return  TimetableDTO.builder()
                 .idTimetable(entity.getIdTimetable())
+                .status(entity.isStatus())
                 .timetableDate(String.valueOf(entity.getTimetableDate().format(formatter)))
                 .build();
     }

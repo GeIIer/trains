@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TypeTrainsRepository extends JpaRepository<TypeTrainsEntity, Long> {
+
+    boolean existsByTypeTrain (String type);
 }

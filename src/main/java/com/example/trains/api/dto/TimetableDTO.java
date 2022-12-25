@@ -19,4 +19,6 @@ public class TimetableDTO {
     private Long idTimetable;
 
     private String timetableDate;
+
+    private boolean status;
 }
