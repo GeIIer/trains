@@ -54,18 +54,34 @@ public class Rail extends State implements Serializable {
         if (jsonNode.has("ry_right")) this.setRy_right(jsonNode.get("ry_right").asBoolean());
         if (jsonNode.has("light")) this.setLight(jsonNode.get("light").asBoolean());
     }
-    //TODO проверка на угол
+    //TODO проверка на угол - я сделаль, работает, но лучше еще проверить
     public int getDir (int x, int y, int lengthX, int lengthY) {
-        if (x == 0) {
+        if ((x==0)) {
+            if (y==0) {
+                if ((this.y)&&(this.x)) return 20;
+                if (this.y) return 0;
+            }
+            if (y == lengthY - 1) {
+                if ((this.y)&&(this.x)) return 42;
+                if (this.y) return 4;
+            }
             if (this.x) return 2;
         }
-        else if (x == lengthX - 1) {
+        if (x == lengthX - 1) {
+            if (y==0) {
+                if ((this.y)&&(this.x)) return 60;
+                if (this.y) return 0;
+            }
+            if (y == lengthY - 1) {
+                if ((this.y)&&(this.x)) return 64;
+                if (this.y) return 4;
+            }
             if (this.x) return 6;
         }
-        else if (y == 0) {
+        if (y==0) {
             if (this.y) return 0;
         }
-        else if (y == lengthY - 1) {
+        if (y == lengthY - 1) {
             if (this.y) return 4;
         }
         throw new RuntimeException("Ошибка направления");

@@ -19,11 +19,12 @@ public interface CityRepository extends JpaRepository<CityEntity, Long> {
 
     Optional<CityEntity> findByCityName(String cityName);
 
-    @Query(value = "()", nativeQuery = true)
+    @Query(value = "SELECT id_city, city_name From topology t RIGHT JOIN city c on t.city_id_city = c.id_city WHERE t.city_id_city IS NULL group by id_city, city_name", nativeQuery = true)
     List<CityEntity> findCityWithoutTopology();
 
     @Query(value = "SELECT id_city, city_name, count(*) as \"count\" FROM city\n" +
             "RIGHT JOIN topology t on city.id_city = t.city_id_city\n" +
             "group by id_city, city_name", nativeQuery = true)
     List<CityDTOWithCount> findCityWithTopology();
+
 }

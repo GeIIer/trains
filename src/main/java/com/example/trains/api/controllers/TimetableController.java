@@ -166,4 +166,5 @@ public class TimetableController {
         }
         return new ResponseEntity<>("Произошла ошибка при удалении", HttpStatus.OK);
     }
+
 }
