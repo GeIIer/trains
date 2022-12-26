@@ -1,7 +1,9 @@
 package com.example.trains.api.controllers;
 
+import com.example.trains.api.dto.TrainDTO;
 import com.example.trains.api.entities.TrainEntity;
 import com.example.trains.api.entities.TypeTrainsEntity;
+import com.example.trains.api.factory.TrainDTOFactory;
 import com.example.trains.api.repositories.TrainRepository;
 import com.example.trains.api.repositories.TypeTrainsRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,18 +26,21 @@ public class TrainController {
     private final TrainRepository trainRepository;
     @Autowired
     private final TypeTrainsRepository typeTrainsRepository;
-
+    @Autowired
+    private final TrainDTOFactory trainDTOFactory;
     private static final String GET_ALL_TRAINS = "";
 
-    private static final String GET_ALL_TYPE_TRAINS = "";
+    private static final String GET_ALL_TYPE_TRAINS = "/type";
 
     private static final String ADD_TRAIN = "";
 
-    private static final String DELETE_TRAIN = "/{idTrain}";
+    private static final String DELETE_TRAIN = "";
 
     @RequestMapping(GET_ALL_TRAINS)
-    public List<TrainEntity> getAllTrains() {
-        return trainRepository.findAll();
+    public List<TrainDTO> getAllTrains() {
+        return (trainRepository.findAll()
+                .stream().map(trainDTOFactory::makeTrainDTO)
+                .collect(Collectors.toList()));
     }
 
     @RequestMapping(GET_ALL_TYPE_TRAINS)
@@ -51,6 +57,7 @@ public class TrainController {
                 trainEntity.setNameTrain(train.getNameTrain());
                 trainEntity.setNumberOfWagons(train.getNumberOfWagons());
                 trainEntity.setTypeTrain(train.getTypeTrain());
+                trainRepository.save(trainEntity);
             }
         }
         else {
@@ -59,15 +66,15 @@ public class TrainController {
     }
 
     @DeleteMapping(DELETE_TRAIN)
-    public ResponseEntity<String> deleteTrain (@PathVariable("idTrain") Long idTrain) {
+    public ResponseEntity<String> deleteTrain (@RequestParam("idTrain") Long idTrain) {
         try {
             Optional<TrainEntity> optionalTrainEntity = trainRepository.findById(idTrain);
             if (optionalTrainEntity.isEmpty()) {
-                return new ResponseEntity<>("Такого расписания нет", HttpStatus.OK);
+                return new ResponseEntity<>("Такого поезда нет", HttpStatus.OK);
             }
             TrainEntity train = optionalTrainEntity.get();
             trainRepository.delete(train);
-            return new ResponseEntity<>("Удаление расписания произошло успешно", HttpStatus.OK);
+            return new ResponseEntity<>("Удаление поезда произошло успешно", HttpStatus.OK);
         }
         catch (Exception ex) {
             System.err.println(ex.getMessage());

@@ -61,7 +61,7 @@ public class TopologyController {
     private static final String GET_ALL_PLATES = "/plates";
     private static final String GET_TOPOLOGY_AND_RECORDS = "/{idTopology}/{date}";
 
-    private static final String DELETE_TOPOLOGY = "/{idTopology}";
+    private static final String DELETE_TOPOLOGY = "";
 
     @PostMapping(CREATE_TOPOLOGY)
     public void createTopology(@RequestParam("topologyName") String topologyName,
@@ -99,7 +99,7 @@ public class TopologyController {
         }
     }
 
-    @PostMapping(UPLOAD_TOPOLOGY) //TODO сделать сохранение по idTopology
+    @PostMapping(UPLOAD_TOPOLOGY) //TODO Обновление статуса расписаний при изменении
     public String uploadTopology(@RequestParam("idTopology") Long idTopology,
                                  @RequestBody String matrix) {
         try {
@@ -216,7 +216,7 @@ public class TopologyController {
     }
 
     @DeleteMapping(DELETE_TOPOLOGY)
-    public ResponseEntity<String> deleteTimetable (@PathVariable("idTopology") Long idTopology) {
+    public ResponseEntity<String> deleteTimetable (@RequestParam("idTopology") Long idTopology) {
         Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
         if (optionalTopologyEntity.isEmpty()) {
             return new ResponseEntity<>("Такой топологии нет", HttpStatus.OK);

@@ -1,31 +1,29 @@
-package com.example.trains.api.entities;
+package com.example.trains.api.dto;
 
+import com.example.trains.api.entities.TypeTrainsEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
-@Entity
+
+@Data
+@Builder(builderClassName = "Builder", toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@Table(name = "train")
-public class TrainEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class TrainDTO {
     @JsonProperty("idTrain")
     private Long idTrain;
 
     @JsonProperty("nameTrain")
     private String nameTrain;
 
-    @ManyToOne (fetch = FetchType.LAZY, optional = false)
     @JsonProperty("typeTrain")
-    private TypeTrainsEntity typeTrain;
+    private String typeTrain;
 
     @JsonProperty("numberOfWagons")
     private int numberOfWagons;
+
 }
