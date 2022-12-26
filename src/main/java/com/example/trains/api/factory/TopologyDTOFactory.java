@@ -11,7 +11,7 @@ public class TopologyDTOFactory {
                 .idTopology(entity.getIdTopology())
                 .topologyName(entity.getTopologyName())
                 .accountName(entity.getAccount().getName())
-                .city(entity.getCity().getCityName())
+                .cityName(entity.getCity().getCityName())
                 .build();
     }
 }

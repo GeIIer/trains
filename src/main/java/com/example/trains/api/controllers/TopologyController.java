@@ -15,6 +15,7 @@ import com.example.trains.api.timetableFile.PlatesAndInOut;
 import com.example.trains.api.timetableFile.PlatesAndInOutSerializer;
 import com.example.trains.api.timetableFile.Record;
 import com.example.trains.api.topologyFile.*;
+import com.example.trains.authorization.entities.AccountEntity;
 import com.example.trains.authorization.repositories.AccountRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -57,6 +59,7 @@ public class TopologyController {
     private static final String CREATE_TOPOLOGY = "/create";
     private static final String UPLOAD_TOPOLOGY = "";
     private static final String DOWNLOAD_TOPOLOGY = "";
+    private static final String GET_TOPOLOGY = "/bycity";
     private static final String GET_ALL_TOPOLOGY = "/all";
     private static final String GET_ALL_PLATES = "/plates";
     private static final String GET_TOPOLOGY_AND_RECORDS = "/{idTopology}/{date}";
@@ -69,29 +72,32 @@ public class TopologyController {
                                @RequestParam("city") String city,
                                @RequestBody String matrix) {
         try {
-            Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByTopologyNameAndAccount_Name(topologyName, accountName);
-            if (optionalTopologyEntity.isPresent()) {
-                throw new RuntimeException("Такая топология уже существует: ");
+            Optional<AccountEntity> optionalAccountEntity = accountRepository.findByName(accountName);
+            if (optionalAccountEntity.isPresent()) {
+                Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByTopologyNameAndAccount(topologyName, optionalAccountEntity.get());
+                if (optionalTopologyEntity.isPresent()) {
+                    throw new RuntimeException("Такая топология уже существует: ");
+                } else {
+                    Optional<CityEntity> cityEntity = cityRepository.findByCityName(city);
+                    if (cityEntity.isPresent()) {
+                        TopologyEntity topologyEntity = new TopologyEntity();
+                        topologyEntity.setTopologyName(topologyName);
+                        topologyEntity.setCity(cityEntity.get());
+                        topologyEntity.setAccount(optionalAccountEntity.get());
+                        topologyEntity.setFilename(topologyName + accountName);
+
+                        ObjectMapper mapper = new ObjectMapper();
+                        TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
+                        fileService.saveTopology(topologyEntity, topology);
+
+                        topologyRepository.save(topologyEntity);
+                    } else {
+                        throw new RuntimeException("Такого города нет ");
+                    }
+                }
             }
-            else
-            {
-                Optional<CityEntity> cityEntity = cityRepository.findByCityName(city);
-                if (cityEntity.isPresent()) {
-                    TopologyEntity topologyEntity = new TopologyEntity();
-                    topologyEntity.setTopologyName(topologyName);
-                    topologyEntity.setCity(cityEntity.get());
-                    topologyEntity.setAccount(accountRepository.findByName(accountName));
-                    topologyEntity.setFilename(topologyName + accountName);
-
-                    ObjectMapper mapper = new ObjectMapper();
-                    TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
-                    fileService.saveTopology(topologyEntity, topology);
-
-                    topologyRepository.save(topologyEntity);
-                }
-                else {
-                    throw new RuntimeException("Такого города нет ");
-                }
+            else {
+                throw new RuntimeException("Пользователь не зарегистрирован ");
             }
         }
         catch (Exception ex) {
@@ -146,6 +152,19 @@ public class TopologyController {
             System.err.println(ex.getMessage());
         }
         throw new RuntimeException();
+    }
+
+    @GetMapping(GET_TOPOLOGY)
+    public List<TopologyDTO> getTopologiesByCity(@RequestParam("cityName") String cityName) {
+        Optional<CityEntity> city = cityRepository.findByCityName(cityName);
+        if (city.isPresent()) {
+            return (topologyRepository.findAllByCity(city.get())
+                    .stream().map(topologyDTOFactory::makeTopologyDTO)
+                    .collect(Collectors.toList()));
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Такого города не существует");
+        }
     }
 
     @GetMapping(GET_ALL_TOPOLOGY)

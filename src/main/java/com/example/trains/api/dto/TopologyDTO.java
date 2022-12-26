@@ -14,5 +14,5 @@ public class TopologyDTO {
     @NonNull
     private String accountName;
     @NonNull
-    private String city;
+    private String cityName;
 }
