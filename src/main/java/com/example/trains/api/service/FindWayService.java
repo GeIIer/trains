@@ -23,6 +23,20 @@ public class FindWayService {
     int endY;
     TopologyFileDTO topology = new TopologyFileDTO();
     public ArrayList<Step> getWay(Step start, Cell end, ArrayList<Cell> stops, TopologyFileDTO topology){
+
+        if(start.getDir()>7){
+            int d = start.getDir();
+            ArrayList<ArrayList<Step>> ways2dir = new ArrayList<>(2);
+            for(int i=0; i<2; i++){
+                ways2dir.add(i, getWay(new Step(start.getX(), start.getY(), d%10), end, stops, topology));
+                d/=10;
+            }
+            if (ways2dir.get(0)==null) if (ways2dir.get(1)==null) return null;
+            else return ways2dir.get(1);
+            if (ways2dir.get(1)==null) return ways2dir.get(0);
+            if (ways2dir.get(0).size()<ways2dir.get(1).size()) return ways2dir.get(0);
+            else return ways2dir.get(1);
+        }
         this.topology = topology;
         ArrayList<Step> endWay = new ArrayList<>();
         endWay.add(start);

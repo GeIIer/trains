@@ -17,4 +17,5 @@ public class Step implements Serializable {
     int y;
     @JsonProperty("dir")
     int dir;
+
 }

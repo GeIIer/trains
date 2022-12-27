@@ -40,7 +40,7 @@ public class CityController {
 
     @RequestMapping(GET_ALL_CITY_WITHOUT_TOPOLOGY)
     public List<CityDTO> getAllCitiesWithoutTopology() {
-        return (cityRepository.findAll()
+        return (cityRepository.findCityWithoutTopology()
                 .stream().map(cityDTOFactory::makeCityDTO)
                 .collect(Collectors.toList()));
     }
