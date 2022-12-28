@@ -1,5 +1,6 @@
 package com.example.trains.api.service;
 
+import com.example.trains.api.dto.RecordAndWayDTO;
 import com.example.trains.api.entities.TimetableEntity;
 import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.timetableFile.Record;
@@ -46,8 +47,7 @@ public class FileService {
             throw new RuntimeException("Ошибка: " + e.getMessage());
         }
     }
-
-    public void saveTimetable (TimetableEntity timetableEntity, ArrayList<Record> records) {
+    public void saveTimetable (TimetableEntity timetableEntity, ArrayList<RecordAndWayDTO> recordAndWayDTOS) {
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
@@ -56,7 +56,7 @@ public class FileService {
             Path filePath = Paths.get(uploadPath + "/" + timetableEntity.getFileName());
             FileOutputStream fileOutputStream = new FileOutputStream(filePath.toString());
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream);
-            objectOutputStream.writeObject(records);
+            objectOutputStream.writeObject(recordAndWayDTOS);
             objectOutputStream.close();
             fileOutputStream.close();
         } catch (Exception e) {
@@ -84,8 +84,7 @@ public class FileService {
             throw new RuntimeException("Ошибка: " + e.getMessage());
         }
     }
-
-    public ArrayList<Record> loadRecords (String fileName) {
+    public ArrayList<RecordAndWayDTO> loadRecords (String fileName) {
         try {
             Path root = Paths.get(uploadPath);
             if (!Files.exists(root)) {
@@ -97,10 +96,10 @@ public class FileService {
             }
             FileInputStream fileInputStream = new FileInputStream(recordsPath.toString());
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
-            ArrayList<Record> records = (ArrayList<Record>) objectInputStream.readObject();
+            ArrayList<RecordAndWayDTO> recordAndWayDTOS = (ArrayList<RecordAndWayDTO>) objectInputStream.readObject();
             objectInputStream.close();
             fileInputStream.close();
-            return records;
+            return recordAndWayDTOS;
         } catch (Exception e) {
             throw new RuntimeException("Ошибка: " + e.getMessage());
         }

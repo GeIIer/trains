@@ -91,7 +91,7 @@ public class TimetableController {
         }
     }
 
-    @PostMapping(SAVE_TIMETABLE) //TODO сделать сохранения путей
+    @PostMapping(SAVE_TIMETABLE)
     public void createTimetable (@RequestParam("idTopology") Long idTopology,
                                  @RequestParam("date") String dateTimeString,
                                  @RequestBody ArrayList<Record> records) {
@@ -115,7 +115,7 @@ public class TimetableController {
             TopologyFileDTO topologyFileDTO = fileService.loadTopology(topologyEntity.getFilename());
             try {
                 ArrayList<RecordAndWayDTO> recordAndWayDTOS = findWayService.getRecordsAndWays(records, topologyFileDTO);
-                fileService.saveTimetable(timetableEntity, records);
+                fileService.saveTimetable(timetableEntity, recordAndWayDTOS);
                 timetableRepository.save(timetableEntity);
             }
             catch (Exception ex){
@@ -129,7 +129,6 @@ public class TimetableController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Топологии не существует");
         }
     }
-
     private ArrayList<Record> getRecords(Long idTopology, String dateTimeString) {
         Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
         if (optionalTopologyEntity.isPresent()) {
@@ -138,7 +137,10 @@ public class TimetableController {
             Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByTimetableDateAndTopology(date, optionalTopologyEntity.get());
             if (optionalTimetableEntity.isPresent()) {
                 TimetableEntity timetable = optionalTimetableEntity.get();
-                return fileService.loadRecords(timetable.getFileName());
+                ArrayList<RecordAndWayDTO> recordAndWayDTOS = fileService.loadRecords(timetable.getFileName());
+                ArrayList<Record> record = new ArrayList<Record>();
+                for (int i = 0; i<recordAndWayDTOS.size(); i++) record.add(i, recordAndWayDTOS.get(i).getRecord());
+                return record;
             }
             else {
                 throw new RuntimeException("Нет записей в расписании: ");

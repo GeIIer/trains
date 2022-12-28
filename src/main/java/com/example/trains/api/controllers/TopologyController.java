@@ -228,7 +228,7 @@ public class TopologyController {
         throw new RuntimeException("Ошибка: ");
     }
 
-    @GetMapping(GET_TOPOLOGY_AND_RECORDS) //TODO сделать обработку маршрута
+    @GetMapping(GET_TOPOLOGY_AND_RECORDS)
     public TopologyAndRecordsDTO getTopologyAndRecords (@PathVariable("idTopology") Long idTopology,
                                                         @PathVariable("date") String dateTimeString) {
         try {
@@ -241,8 +241,7 @@ public class TopologyController {
                     TopologyEntity topology = optionalTopologyEntity.get();
                     TimetableEntity timetable = optionalTimetableEntity.get();
                     TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
-                    ArrayList<Record> records = fileService.loadRecords(timetable.getFileName());
-                    ArrayList<RecordAndWayDTO> recordAndWayDTOS = findWayService.getRecordsAndWays(records, topologyFileDTO);
+                    ArrayList<RecordAndWayDTO> recordAndWayDTOS = fileService.loadRecords(timetable.getFileName());
                     TopologyAndRecordsDTO topologyAndRecordsDTO = new TopologyAndRecordsDTO(topologyFileDTO.getBody(), recordAndWayDTOS);
                     return topologyAndRecordsDTO;
                 } else {
