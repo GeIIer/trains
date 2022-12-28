@@ -16,5 +16,5 @@ public class AccountDTO {
     @NonNull
     private String email;
     @NonNull
-    private List<String> roles;
+    private String role;
 }
