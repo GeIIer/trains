@@ -91,7 +91,7 @@ public class TimetableController {
         }
     }
 
-    @PostMapping(SAVE_TIMETABLE)
+    @PostMapping(SAVE_TIMETABLE) //TODO сделать сохранения путей
     public void createTimetable (@RequestParam("idTopology") Long idTopology,
                                  @RequestParam("date") String dateTimeString,
                                  @RequestBody ArrayList<Record> records) {
@@ -110,6 +110,7 @@ public class TimetableController {
                 timetableEntity.setTimetableDate(LocalDate.parse(dateTimeString, formatter));
                 timetableEntity.setTopology(topologyEntity);
                 timetableEntity.setFileName(topologyEntity.getFilename() + "/" + dateTimeString + ".bin");
+                timetableEntity.setStatus(true);
             }
             TopologyFileDTO topologyFileDTO = fileService.loadTopology(topologyEntity.getFilename());
             try {

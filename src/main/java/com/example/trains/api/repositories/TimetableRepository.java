@@ -20,6 +20,11 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Long
 
     Optional<TimetableEntity> findByIdTimetable(Long idTimetable);
 
+//    @Transactional
+//    @Modifying(clearAutomatically = true)
+//    @Query(value = "", nativeQuery = true)
+//    void updateStatusTrue(Long idTopology);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query(value = "DELETE FROM timetable te WHERE te.topology_id_topology IN (SELECT te.topology_id_topology FROM topology tp WHERE tp.id_topology = :id)", nativeQuery = true)

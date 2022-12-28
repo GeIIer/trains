@@ -4,6 +4,7 @@ import com.example.trains.api.dto.*;
 import com.example.trains.api.entities.CityEntity;
 import com.example.trains.api.entities.TimetableEntity;
 import com.example.trains.api.entities.TopologyEntity;
+import com.example.trains.api.factory.CityDTOFactory;
 import com.example.trains.api.factory.TopologyDTOFactory;
 import com.example.trains.api.factory.TrainDTOFactory;
 import com.example.trains.api.repositories.CityRepository;
@@ -55,6 +56,8 @@ public class TopologyController {
     private final TopologyDTOFactory topologyDTOFactory;
     @Autowired
     private final TrainDTOFactory trainDTOFactory;
+    @Autowired
+    private final CityDTOFactory cityDTOFactory;
     @Autowired
     private final FileService fileService;
     @Autowired
@@ -121,6 +124,7 @@ public class TopologyController {
                 ObjectMapper mapper = new ObjectMapper();
                 TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
                 fileService.saveTopology(topologyEntity, topology);
+                //timetableRepository.updateStatusTrue(topologyEntity.getIdTopology());
                 System.out.println("Топология загружена");
                 System.out.println(topology.getTitle());
                 System.out.println(topology.getBody());
@@ -197,7 +201,14 @@ public class TopologyController {
                     System.err.println("Нет созданных поездов");
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка: нет созданных поездов");
                 }
-                PlatesAndInOut platesAndInOut = new PlatesAndInOut(inOut, plates, trains);
+                List<CityDTO> cityDTOS = cityRepository.findAll()
+                        .stream().map(cityDTOFactory::makeCityDTO)
+                        .collect(Collectors.toList());
+                if (cityDTOS.size() == 0) {
+                    System.err.println("Нет созданных городов");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка: нет созданных городов");
+                }
+                PlatesAndInOut platesAndInOut = new PlatesAndInOut(inOut, plates, trains, cityDTOS);
                 ObjectMapper mapper = new ObjectMapper();
                 SimpleModule module = new SimpleModule();
                 module.addSerializer(PlatesAndInOut.class, new PlatesAndInOutSerializer());
@@ -217,7 +228,7 @@ public class TopologyController {
         throw new RuntimeException("Ошибка: ");
     }
 
-    @GetMapping(GET_TOPOLOGY_AND_RECORDS)
+    @GetMapping(GET_TOPOLOGY_AND_RECORDS) //TODO сделать обработку маршрута
     public TopologyAndRecordsDTO getTopologyAndRecords (@PathVariable("idTopology") Long idTopology,
                                                         @PathVariable("date") String dateTimeString) {
         try {

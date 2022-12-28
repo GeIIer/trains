@@ -54,7 +54,7 @@ public class Rail extends State implements Serializable {
         if (jsonNode.has("ry_right")) this.setRy_right(jsonNode.get("ry_right").asBoolean());
         if (jsonNode.has("light")) this.setLight(jsonNode.get("light").asBoolean());
     }
-    //TODO проверка на угол - я сделаль, работает, но лучше еще проверить
+
     public int getDir (int x, int y, int lengthX, int lengthY) {
         if ((x==0)) {
             if (y==0) {
