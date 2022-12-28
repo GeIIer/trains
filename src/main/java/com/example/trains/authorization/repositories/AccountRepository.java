@@ -24,8 +24,6 @@ public interface AccountRepository extends JpaRepository<AccountEntity, Long> {
     long count();
 
     //
-/*    @Query(value = "SELECT id_city, city_name,  FROM city\n" +
-            "RIGHT JOIN topology t on city.id_city = t.city_id_city\n" +
-            "group by id_city, city_name", nativeQuery = true)
-    ArrayList<AccountDTO> getModeratorsSQL();*/
+    @Query(value = "SSELECT a.id, a.name, email, r.name From account a RIGHT JOIN role r on r.id = a.role_id WHERE r.name = 'MODERATOR' group by a.id, a.name, email, r.name\n", nativeQuery = true)
+    ArrayList<AccountDTO> getModeratorsSQL();
 }

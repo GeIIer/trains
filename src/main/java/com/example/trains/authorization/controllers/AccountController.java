@@ -44,9 +44,7 @@ public class AccountController {
 
     //TODO get на возвращение всех модераторов
     public ArrayList<AccountDTO> getModerators(){
-
-        //accountRepository
-        return  new ArrayList<>();
+        return  accountRepository.getModeratorsSQL();
     }//MODERATOR
 
     @PostMapping()
