@@ -50,7 +50,7 @@ public class TimetableController {
 
     private static final String SAVE_TIMETABLE = "/save";
 
-    private static final String DELETE_TIMETABLE = "/{idTimetable}";
+    private static final String DELETE_TIMETABLE = "";
 
     @GetMapping(GET_ALL_TIMETABLE)
     public List<TimetableDTO> getAllTimetable(@RequestParam("idTopology") Long idTopology) {
@@ -153,7 +153,7 @@ public class TimetableController {
     }
 
     @DeleteMapping(DELETE_TIMETABLE)
-    public ResponseEntity<String> deleteTimetable (@PathVariable("idTimetable") Long idTimetable) {
+    public ResponseEntity<String> deleteTimetable (@RequestParam("idTimetable") Long idTimetable) {
 
         Optional<TimetableEntity> optionalTimetableEntity = timetableRepository.findByIdTimetable(idTimetable);
         if (optionalTimetableEntity.isEmpty()) {

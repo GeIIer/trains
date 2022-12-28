@@ -258,7 +258,7 @@ public class TopologyController {
     }
 
     @DeleteMapping(DELETE_TOPOLOGY)
-    public ResponseEntity<String> deleteTimetable (@RequestParam("idTopology") Long idTopology) {
+    public ResponseEntity<String> deleteTopology (@RequestParam("idTopology") Long idTopology) {
         Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByIdTopology(idTopology);
         if (optionalTopologyEntity.isEmpty()) {
             return new ResponseEntity<>("Такой топологии нет", HttpStatus.OK);

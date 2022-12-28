@@ -8,13 +8,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 @Data
 @Builder(builderClassName = "Builder", toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecordAndWayDTO {
+public class RecordAndWayDTO implements Serializable {
     @JsonProperty("record")
     private Record record;
     @JsonProperty("way")
