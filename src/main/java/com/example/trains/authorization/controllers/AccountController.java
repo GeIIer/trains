@@ -37,16 +37,17 @@ public class AccountController {
             return new AccountDTO(accountEntity.getId(),
                     accountEntity.getName(),
                     accountEntity.getEmail(),
-                    accountEntity.getRoles()
-                            .stream()
-                            .map(RoleEntity::getName)
-                            .collect(Collectors.toList()));
+                    accountEntity.getRole().getName());
         }
         else return null;
     }
 
     //TODO get на возвращение всех модераторов
+    public ArrayList<AccountDTO> getModerators(){
 
+        //accountRepository
+        return  new ArrayList<>();
+    }//MODERATOR
 
     @PostMapping()
     public ResponseEntity<String> saveUser(@RequestBody AccountEntity account) {
@@ -61,13 +62,12 @@ public class AccountController {
         if (accountRepository.existsAccountEntityByEmail(account.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email уже существует");
         }
-        ArrayList<RoleEntity> roles = new ArrayList<>();
-        roles.add(roleRepository.findByName("MODERATOR"));
+        RoleEntity role = roleRepository.findByName("MODERATOR");
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.setName(account.getName());
         accountEntity.setEmail(account.getEmail());
         accountEntity.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
-        accountEntity.setRoles(roles);
+        accountEntity.setRole(role);
         accountRepository.save(accountEntity);
         return ResponseEntity.ok("Регистрация прошла успешно");
     }

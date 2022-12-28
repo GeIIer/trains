@@ -27,15 +27,11 @@ public class UserService implements UserDetailsService {
         if (userEntity == null)
             throw new UsernameNotFoundException(email);
 
-        String[] roles = new String[userEntity.getRoles().size()];
-        for (int i = 0; i < roles.length; i++){
-            roles[i] = userEntity.getRoles().get(i).getName();
-        }
         //return new User(userEntity.getEmail(), userEntity.getPassword(), new ArrayList<>());
         UserDetails user = User.builder()
                 .username(userEntity.getEmail())
                 .password(userEntity.getPassword())
-                .roles(roles)
+                .roles(userEntity.getRole().getName())
                 .build();
         return user;
     }

@@ -48,15 +48,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 throw new BadCredentialsException("Не существует: "+account);
             }
 
-            String[] roles = new String[account.getRoles().size()];
-            for (int i = 0; i < roles.length; i++){
-                roles[i] = account.getRoles().get(i).getName();
-            }
-
             UserDetails principal = User.builder()
                     .username(account.getEmail())
                     .password(account.getPassword())
-                    .roles(roles)
+                    .roles(account.getRole().getName())
                     .build();
 
             return authenticationManager.authenticate(
