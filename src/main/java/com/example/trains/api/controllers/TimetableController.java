@@ -18,8 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -73,7 +71,7 @@ public class TimetableController {
 
     @GetMapping(GET_RECORDS)
     public ArrayList<Record> getRecordsByTimetable (@RequestParam("idTopology") Long idTopology,
-                                               @RequestParam("date") String dateTimeString) {
+                                                    @RequestParam("date") String dateTimeString) {
         return getRecords(idTopology, dateTimeString);
     }
 

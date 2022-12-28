@@ -1,19 +1,15 @@
 package com.example.trains.api.service;
 
 import com.example.trains.api.dto.RecordAndWayDTO;
-import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.timetableFile.Record;
 import com.example.trains.api.topologyFile.Cell;
 import com.example.trains.api.topologyFile.Rail;
 import com.example.trains.api.topologyFile.Step;
 import com.example.trains.api.topologyFile.TopologyFileDTO;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Optional;
 
 @Service
 public class FindWayService {

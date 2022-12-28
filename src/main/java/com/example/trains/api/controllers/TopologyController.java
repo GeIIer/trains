@@ -5,9 +5,11 @@ import com.example.trains.api.entities.CityEntity;
 import com.example.trains.api.entities.TimetableEntity;
 import com.example.trains.api.entities.TopologyEntity;
 import com.example.trains.api.factory.TopologyDTOFactory;
+import com.example.trains.api.factory.TrainDTOFactory;
 import com.example.trains.api.repositories.CityRepository;
 import com.example.trains.api.repositories.TimetableRepository;
 import com.example.trains.api.repositories.TopologyRepository;
+import com.example.trains.api.repositories.TrainRepository;
 import com.example.trains.api.service.FileService;
 import com.example.trains.api.service.FindWayService;
 import com.example.trains.api.service.TopologyFileService;
@@ -44,11 +46,15 @@ public class TopologyController {
     @Autowired
     private final TimetableRepository timetableRepository;
     @Autowired
+    private final TrainRepository trainRepository;
+    @Autowired
     private final AccountRepository accountRepository;
     @Autowired
     private final CityRepository cityRepository;
     @Autowired
     private final TopologyDTOFactory topologyDTOFactory;
+    @Autowired
+    private final TrainDTOFactory trainDTOFactory;
     @Autowired
     private final FileService fileService;
     @Autowired
@@ -184,7 +190,14 @@ public class TopologyController {
                 TopologyFileDTO topologyFileDTO = fileService.loadTopology(topology.getFilename());
                 ArrayList<Cell> inOut = topologyFileService.getInOut(topologyFileDTO.getBody());
                 ArrayList<Plate> plates = topologyFileService.getPlates(topologyFileDTO.getBody());
-                PlatesAndInOut platesAndInOut = new PlatesAndInOut(inOut, plates);
+                List<TrainDTO> trains = trainRepository.findAll()
+                        .stream().map(trainDTOFactory::makeTrainDTO)
+                        .collect(Collectors.toList());
+                if (trains.size() == 0) {
+                    System.err.println("Нет созданных поездов");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка: нет созданных поездов");
+                }
+                PlatesAndInOut platesAndInOut = new PlatesAndInOut(inOut, plates, trains);
                 ObjectMapper mapper = new ObjectMapper();
                 SimpleModule module = new SimpleModule();
                 module.addSerializer(PlatesAndInOut.class, new PlatesAndInOutSerializer());

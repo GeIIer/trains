@@ -1,5 +1,6 @@
 package com.example.trains.api.timetableFile;
 
+import com.example.trains.api.dto.TrainDTO;
 import com.example.trains.api.topologyFile.*;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -32,6 +33,17 @@ public class PlatesAndInOutSerializer extends StdSerializer<PlatesAndInOut> {
             Plate plate = platesAndInOut.getPlates().get(i);
             jsonGenerator.writeStartObject();
             cellSerializer.plateSerialize(plate, jsonGenerator);
+            jsonGenerator.writeEndObject();
+        }
+        jsonGenerator.writeEndArray();
+        jsonGenerator.writeArrayFieldStart("trains");
+        for (int i = 0; i < platesAndInOut.getTrains().size(); i++) {
+            TrainDTO trainDTO = platesAndInOut.getTrains().get(i);
+            jsonGenerator.writeStartObject();
+            jsonGenerator.writeNumberField("idTrain", trainDTO.getIdTrain());
+            jsonGenerator.writeStringField("nameTrain", trainDTO.getNameTrain());
+            jsonGenerator.writeStringField("typeTrain", trainDTO.getTypeTrain());
+            jsonGenerator.writeNumberField("numberOfWagons", trainDTO.getNumberOfWagons());
             jsonGenerator.writeEndObject();
         }
         jsonGenerator.writeEndArray();
