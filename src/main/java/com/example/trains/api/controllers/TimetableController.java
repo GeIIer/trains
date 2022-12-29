@@ -110,12 +110,12 @@ public class TimetableController {
                 timetableEntity.setTimetableDate(LocalDate.parse(dateTimeString, formatter));
                 timetableEntity.setTopology(topologyEntity);
                 timetableEntity.setFileName(topologyEntity.getFilename() + "/" + dateTimeString + ".bin");
-                timetableEntity.setStatus(true);
             }
             TopologyFileDTO topologyFileDTO = fileService.loadTopology(topologyEntity.getFilename());
             try {
                 ArrayList<RecordAndWayDTO> recordAndWayDTOS = findWayService.getRecordsAndWays(records, topologyFileDTO);
                 fileService.saveTimetable(timetableEntity, recordAndWayDTOS);
+                timetableEntity.setStatus(true);
                 timetableRepository.save(timetableEntity);
             }
             catch (Exception ex){

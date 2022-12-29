@@ -20,10 +20,12 @@ public interface TimetableRepository extends JpaRepository<TimetableEntity, Long
 
     Optional<TimetableEntity> findByIdTimetable(Long idTimetable);
 
-//    @Transactional
-//    @Modifying(clearAutomatically = true)
-//    @Query(value = "", nativeQuery = true)
-//    void updateStatusTrue(Long idTopology);
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query(value = "UPDATE timetable\n" +
+            "SET status = false\n" +
+            "WHERE topology_id_topology = :idTopology", nativeQuery = true)
+    void updateStatusFalse(Long idTopology);
 
     @Transactional
     @Modifying(clearAutomatically = true)

@@ -124,7 +124,7 @@ public class TopologyController {
                 ObjectMapper mapper = new ObjectMapper();
                 TopologyFileDTO topology = mapper.readValue(matrix, TopologyFileDTO.class);
                 fileService.saveTopology(topologyEntity, topology);
-                //timetableRepository.updateStatusTrue(topologyEntity.getIdTopology());
+                timetableRepository.updateStatusFalse(topologyEntity.getIdTopology());
                 System.out.println("Топология загружена");
                 System.out.println(topology.getTitle());
                 System.out.println(topology.getBody());
