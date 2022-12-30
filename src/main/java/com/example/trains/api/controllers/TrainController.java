@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping({"/api/train"})
+@ResponseBody
 public class TrainController {
 
     @Autowired
@@ -49,19 +51,27 @@ public class TrainController {
     }
 
     @PostMapping(ADD_TRAIN)
-    public void addTrain(@RequestBody TrainEntity train) {
-        Optional<TrainEntity> optionalTrainEntity = trainRepository.findByNameTrain(train.getNameTrain());
-        if (optionalTrainEntity.isEmpty()) {
-            if (typeTrainsRepository.existsByTypeTrain(train.getTypeTrain().getTypeTrain())) {
-                TrainEntity trainEntity = new TrainEntity();
-                trainEntity.setNameTrain(train.getNameTrain());
-                trainEntity.setNumberOfWagons(train.getNumberOfWagons());
-                trainEntity.setTypeTrain(train.getTypeTrain());
-                trainRepository.save(trainEntity);
+    public void addTrain(@RequestBody TrainDTO train) {
+        try {
+            Optional<TrainEntity> optionalTrainEntity = trainRepository.findByNameTrain(train.getNameTrain());
+            if (optionalTrainEntity.isEmpty()) {
+                Optional<TypeTrainsEntity> optionalTypeTrainsEntity = typeTrainsRepository.findByTypeTrain(train.getTypeTrain());
+                if (optionalTypeTrainsEntity.isPresent()) {
+                    TrainEntity trainEntity = new TrainEntity();
+                    trainEntity.setNameTrain(train.getNameTrain());
+                    trainEntity.setNumberOfWagons(train.getNumberOfWagons());
+                    trainEntity.setTypeTrain(optionalTypeTrainsEntity.get());
+                    trainRepository.save(trainEntity);
+                } else {
+                    throw new RuntimeException("Такого типа поезда не существует");
+                }
+            } else {
+                throw new RuntimeException("Такой поезд уже существует");
             }
         }
-        else {
-            throw new RuntimeException("Такой поезд уже существует");
+        catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 

@@ -13,9 +13,6 @@ import java.util.ArrayList;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-//@JsonIdentityInfo(
-//        generator = ObjectIdGenerators.PropertyGenerator.class,
-//        property = "id", scope = Cell.class)
 public class Plate extends State implements Serializable {
     @JsonProperty("dir")
     private boolean dir;

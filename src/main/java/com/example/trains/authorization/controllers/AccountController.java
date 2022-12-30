@@ -1,6 +1,8 @@
 package com.example.trains.authorization.controllers;
 
+import com.example.trains.api.dto.CityDTOWithCount;
 import com.example.trains.authorization.dto.AccountDTO;
+import com.example.trains.authorization.dto.AccoutDTOModerator;
 import com.example.trains.authorization.entities.AccountEntity;
 import com.example.trains.authorization.entities.RoleEntity;
 import com.example.trains.authorization.repositories.AccountRepository;
@@ -14,6 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,31 +46,60 @@ public class AccountController {
         else return null;
     }
 
-    //TODO get на возвращение всех модераторов
-    public ArrayList<AccountDTO> getModerators(){
-        return  accountRepository.getModeratorsSQL();
-    }//MODERATOR
+    @GetMapping("/allmod")
+    public List<AccountDTO> getModerators(){
+        List<AccoutDTOModerator> accoutDTOModerators = accountRepository.getModeratorsSQL(2L);
+        List<AccountDTO> accountDTOS = new ArrayList<>();
+        for (int i = 0; i < accoutDTOModerators.size(); i++) {
+            accountDTOS.add(new AccountDTO((long) accoutDTOModerators.get(i).getId(), accoutDTOModerators.get(i).getName(),
+                    accoutDTOModerators.get(i).getEmail(), "MODERATOR"));
+        }
+        return accountDTOS;
+    }
 
     @PostMapping()
     public ResponseEntity<String> saveUser(@RequestBody AccountEntity account) {
         return new ResponseEntity<>(userService.saveDto(account), HttpStatus.OK);
     }
 
+    @DeleteMapping()
+    public ResponseEntity<String> deleteUser(@RequestParam("idAccount") Long idAccount) {
+        Optional<AccountEntity> optionalAccountEntity = accountRepository.findById(idAccount);
+        if (optionalAccountEntity.isPresent())
+        {
+            AccountEntity account = optionalAccountEntity.get();
+            accountRepository.delete(account);
+            return ResponseEntity.ok("Удаление произошло успешно");
+        }
+        else {
+            return ResponseEntity.badRequest().body("Данного пользователя не существует");
+        }
+    }
+
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody AccountEntity account) {
-        if (account == null) {
-            return ResponseEntity.badRequest().body("Error: нет данных");
+        try {
+            if (account == null) {
+                return ResponseEntity.badRequest().body("Нет данных для ввода");
+            }
+            if (account.getPassword().length() < 4) {
+                return ResponseEntity.badRequest().body("Пароль не может быть меньше четырех символов");
+            }
+            if (accountRepository.existsAccountEntityByEmail(account.getEmail())) {
+                return ResponseEntity.badRequest().body("Пользователь с данным Email уже существует");
+            }
+            RoleEntity role = roleRepository.findByName("MODERATOR");
+            AccountEntity accountEntity = new AccountEntity();
+            accountEntity.setName(account.getName());
+            accountEntity.setEmail(account.getEmail());
+            accountEntity.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
+            accountEntity.setRole(role);
+            accountRepository.save(accountEntity);
+            return ResponseEntity.ok("Регистрация прошла успешно");
         }
-        if (accountRepository.existsAccountEntityByEmail(account.getEmail())) {
-            return ResponseEntity.badRequest().body("Error: Email уже существует");
+        catch (Exception ex) {
+            System.err.println("Ошибка создания нового пользователя: " + ex.getMessage());
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
-        RoleEntity role = roleRepository.findByName("MODERATOR");
-        AccountEntity accountEntity = new AccountEntity();
-        accountEntity.setName(account.getName());
-        accountEntity.setEmail(account.getEmail());
-        accountEntity.setPassword(bCryptPasswordEncoder.encode(account.getPassword()));
-        accountEntity.setRole(role);
-        accountRepository.save(accountEntity);
-        return ResponseEntity.ok("Регистрация прошла успешно");
     }
 }

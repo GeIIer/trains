@@ -81,9 +81,9 @@ public class TopologyController {
                                @RequestParam("city") String city,
                                @RequestBody String matrix) {
         try {
-            Optional<AccountEntity> optionalAccountEntity = accountRepository.findByName(accountName);
-            if (optionalAccountEntity.isPresent()) {
-                Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByTopologyNameAndAccount(topologyName, optionalAccountEntity.get());
+            AccountEntity optionalAccountEntity = accountRepository.findByEmail(accountName);
+            if (optionalAccountEntity != null) {
+                Optional<TopologyEntity> optionalTopologyEntity = topologyRepository.findByTopologyNameAndAccount(topologyName, optionalAccountEntity);
                 if (optionalTopologyEntity.isPresent()) {
                     throw new RuntimeException("Такая топология уже существует: ");
                 } else {
@@ -92,7 +92,7 @@ public class TopologyController {
                         TopologyEntity topologyEntity = new TopologyEntity();
                         topologyEntity.setTopologyName(topologyName);
                         topologyEntity.setCity(cityEntity.get());
-                        topologyEntity.setAccount(optionalAccountEntity.get());
+                        topologyEntity.setAccount(optionalAccountEntity);
                         topologyEntity.setFilename(topologyName + accountName);
 
                         ObjectMapper mapper = new ObjectMapper();
@@ -224,8 +224,9 @@ public class TopologyController {
         }
         catch (Exception ex){
             System.err.println(ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
-        throw new RuntimeException("Ошибка: ");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ошибка вывода всех платформ");
     }
 
     @GetMapping(GET_TOPOLOGY_AND_RECORDS)

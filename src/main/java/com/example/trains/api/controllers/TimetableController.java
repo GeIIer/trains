@@ -72,7 +72,13 @@ public class TimetableController {
     @GetMapping(GET_RECORDS)
     public ArrayList<Record> getRecordsByTimetable (@RequestParam("idTopology") Long idTopology,
                                                     @RequestParam("date") String dateTimeString) {
-        return getRecords(idTopology, dateTimeString);
+        try {
+            return getRecords(idTopology, dateTimeString);
+        }
+        catch (Exception ex) {
+            System.err.println(ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
     }
 
     @GetMapping(GET_RECORDS_AND_WAY) //TODO Оптимизировать говнокод
@@ -143,12 +149,12 @@ public class TimetableController {
                 return record;
             }
             else {
-                throw new RuntimeException("Нет записей в расписании: ");
+                throw new RuntimeException("Нет записей в расписании");
             }
         }
         else
         {
-            throw new RuntimeException("Топологии не существует: ");
+            throw new RuntimeException("Топологии не существует");
         }
     }
 
